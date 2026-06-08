@@ -58,7 +58,7 @@ export const Stats = () => {
             Stability Fee
           </div>
           <div className={css({ textStyle: "body-lg", fontVariantNumeric: "tabular-nums" })}>
-            {minterData.stabilityFee ? `${minterData.stabilityFee.toFixed(6)}` : "—"}
+            {minterData.stabilityFee != null ? `${minterData.stabilityFee.toFixed(2)}` : "—"}
           </div>
         </div>
         <div
@@ -73,7 +73,7 @@ export const Stats = () => {
             Collateral Rate
           </div>
           <div className={css({ textStyle: "body-lg", fontVariantNumeric: "tabular-nums" })}>
-            {minterData.collateralRate ? `${minterData.collateralRate.toFixed(2)}%` : "—"}
+            {minterData.collateralRate != null ? `${minterData.collateralRate.toFixed(2)}%` : "—"}
           </div>
         </div>
         {isConnected && (
@@ -93,7 +93,7 @@ export const Stats = () => {
                 kUSD Balance
               </div>
               <div className={css({ textStyle: "body-lg", fontVariantNumeric: "tabular-nums" })}>
-                {kUSD ? kUSD.toFixed(2) : "—"}
+                {kUSD != null ? kUSD.toFixed(2) : "—"}
               </div>
             </div>
             <div>
@@ -106,7 +106,7 @@ export const Stats = () => {
                 XTZ Balance
               </div>
               <div className={css({ textStyle: "body-lg", fontVariantNumeric: "tabular-nums" })}>
-                {xtz ? xtz.toFixed(4) : "—"}
+                {xtz != null ? xtz.toFixed(4) : "—"}
               </div>
             </div>
           </>

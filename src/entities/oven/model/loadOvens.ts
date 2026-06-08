@@ -1,5 +1,7 @@
 import { createEffect, createStore, sample, attach } from "effector";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
+import axios from "axios";
+import BigNumber from "bignumber.js";
 import type { InterestData } from "@/shared/api/tezos/kolibri/types";
 import {
   ovensLoaded,
@@ -12,12 +14,8 @@ import {
   type OvenData,
   type PriceData,
 } from "./model";
-import {
-  harbingerClient,
-  stableCoinClient,
-  getOvenClient,
-  getMinterData,
-} from "@/shared/api/tezos/sdk";
+import { stableCoinClient, getOvenClient } from "@/shared/api/tezos/sdk";
+import { NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
 import { $wallet } from "@/entities/wallet/model/model";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -105,16 +103,41 @@ export const refreshOvenFx = attach({
   },
 });
 
-/** Load global data (XTZ price, minter params) */
+const SHARD_PRECISION = new BigNumber(10).pow(18);
+
+const TZKT_API = "https://api.tzkt.io/v1";
+
+interface TzktHeadResponse {
+  quoteUsd: number;
+}
+
+interface MinterStorageResponse {
+  stabilityFee: string;
+  collateralizationPercentage: string;
+}
+
+/** Load global data (XTZ price, minter params) via TzKT API */
 export const loadGlobalDataFx = createEffect(async () => {
-  const [rawPriceData, minterData] = await Promise.all([
-    harbingerClient.getPriceData(),
-    getMinterData(),
+  const [headData, minterStorage] = await Promise.all([
+    axios.get<TzktHeadResponse>(`${TZKT_API}/head`),
+    axios.get<MinterStorageResponse>(`${TZKT_API}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
   ]);
+
   const priceData: PriceData = {
-    timestamp: Math.floor(rawPriceData.time.getTime() / 1000),
-    price: rawPriceData.price,
+    timestamp: Math.floor(Date.now() / 1000),
+    price: new BigNumber(headData.data.quoteUsd),
   };
+
+  const rawStabilityFee = new BigNumber(minterStorage.data.stabilityFee);
+  const rawCollateralRate = new BigNumber(minterStorage.data.collateralizationPercentage);
+
+  const minterData = {
+    stabilityFee: rawStabilityFee.dividedBy(SHARD_PRECISION),
+    collateralRate: rawCollateralRate.dividedBy(SHARD_PRECISION),
+    collateralOperand: null,
+    privateLiquidationThreshold: null,
+  };
+
   return { priceData, minterData };
 });
 
@@ -156,4 +179,12 @@ export const $refreshingOvenAddress = createStore<string | null>(null)
 sample({
   clock: loadOvensFx.fail,
   target: ovensReset,
+});
+
+sample({
+  clock: loadGlobalDataFx.fail,
+  fn: ({ error }) => {
+    console.error("[loadGlobalData] failed:", error);
+  },
+  target: [],
 });

@@ -9,7 +9,11 @@ const CONTRACTS_MAIN = CONTRACTS.MAIN;
 
 export const tezosToolkit = new TezosToolkit(NODE_URL);
 
-export const harbingerClient = new HarbingerClient(NODE_URL, CONTRACTS_MAIN.HARBINGER_NORMALIZER!);
+export const harbingerClient = new HarbingerClient(
+  NODE_URL,
+  CONTRACTS_MAIN.HARBINGER_NORMALIZER!,
+  CONTRACTS_MAIN.MINTER!,
+);
 
 export const stableCoinClient = new StableCoinClient(
   NODE_URL,
@@ -41,10 +45,14 @@ export interface MinterDataResult {
 }
 
 export async function getMinterData(): Promise<MinterDataResult> {
-  const stabilityFee = await stableCoinClient.getSimpleStabilityFee().catch(() => null);
-  const collateralRate = await stableCoinClient
-    .getRequiredCollateralizationRatio()
-    .catch(() => null);
+  const stabilityFee = await stableCoinClient.getSimpleStabilityFee().catch((err) => {
+    console.error("[getMinterData] stabilityFee failed:", err);
+    return null;
+  });
+  const collateralRate = await stableCoinClient.getRequiredCollateralizationRatio().catch((err) => {
+    console.error("[getMinterData] collateralRate failed:", err);
+    return null;
+  });
   return {
     stabilityFee,
     collateralRate,

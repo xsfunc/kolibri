@@ -12,3 +12,4 @@ export {
   balancesUpdated,
 } from "./model/model";
 export type { WalletState, WalletConnectedPayload, WalletBalances } from "./model/model";
+export { loadWalletBalancesFx } from "./model/loadBalances";

@@ -4,6 +4,7 @@ import { restoreSessionFx } from "@/features/connect-wallet/model/model";
 import { loadGlobalDataFx, loadOvensFx } from "@/entities/oven/model/loadOvens";
 import { walletConnected, walletDisconnected } from "@/entities/wallet/model/model";
 import { ovensReset } from "@/entities/oven/model/model";
+import "@/entities/wallet/model/loadBalances";
 
 // ─── On app start ────────────────────────────────────────────────────────────
 
