@@ -16,12 +16,20 @@ export const ConnectPrompt = () => {
       className={css({
         display: "flex",
         justifyContent: "center",
-        paddingTop: "token(spacing.xl)",
+        paddingTop: "token(spacing.md)",
       })}
     >
       <div
-        className={card()}
-        style={{ maxWidth: "400px", width: "100%", alignItems: "center", textAlign: "center" }}
+        className={cx(
+          card(),
+          css({
+            width: "100%",
+            alignItems: "center",
+            textAlign: "center",
+            gap: "token(spacing.sm)",
+            paddingBlock: "token(spacing.xl)",
+          }),
+        )}
       >
         <div
           className={css({
@@ -32,7 +40,6 @@ export const ConnectPrompt = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            marginBottom: "token(spacing.lg)",
           })}
         >
           <Wallet size={28} className={cx(css({ color: "token(colors.primary-fixed-dim)" }))} />
@@ -42,7 +49,7 @@ export const ConnectPrompt = () => {
             textStyle: "headline-sm",
             color: "token(colors.on-surface)",
             fontWeight: "600",
-            margin: "0 0 token(spacing.sm)",
+            margin: "0",
           })}
         >
           Connect Your Wallet
@@ -51,17 +58,17 @@ export const ConnectPrompt = () => {
           className={css({
             textStyle: "body-sm",
             color: "token(colors.on-surface-variant)",
-            margin: "0 0 token(spacing.lg)",
+            margin: "0",
           })}
         >
           To manage your ovens and view your positions
         </p>
         <Button
           variant="primary"
-          size="lg"
+          size="md"
           onClick={() => connect()}
           loading={pending}
-          className={css({ width: "100%" })}
+          className={css({ marginTop: "token(spacing.sm)" })}
         >
           Connect Wallet
         </Button>

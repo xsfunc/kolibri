@@ -23,7 +23,7 @@ export const OvensPage = () => {
     >
       <div className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.lg)" })}>
         <Stats />
-        <WalletBalances />
+        {isConnected && <WalletBalances />}
         {isConnected ? <OvenList /> : <ConnectPrompt />}
       </div>
     </main>
