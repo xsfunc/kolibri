@@ -9,7 +9,9 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
-  fmt: {},
+  fmt: {
+    ignorePatterns: [".agents", "styled-system"],
+  },
   lint: {
     plugins: ["oxc", "typescript", "unicorn", "react"],
     categories: {
@@ -18,7 +20,7 @@ export default defineConfig({
     env: {
       builtin: true,
     },
-    ignorePatterns: ["dist"],
+    ignorePatterns: ["dist", ".agents", "styled-system"],
     overrides: [
       {
         files: ["**/*.{ts,tsx}"],
