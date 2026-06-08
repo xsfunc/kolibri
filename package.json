@@ -1,0 +1,48 @@
+{
+  "name": "kolibri-min",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "tsc -b && vp build",
+    "lint": "vp lint .",
+    "preview": "vp preview"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.5.0",
+    "@ecadlabs/beacon-types": "^4.8.1-ecad.7",
+    "@taquito/beacon-wallet": "^24.3.0",
+    "@taquito/local-forging": "^24.3.0",
+    "@taquito/michel-codec": "^24.3.0",
+    "@taquito/michelson-encoder": "^24.3.0",
+    "@taquito/rpc": "^24.3.0",
+    "@taquito/taquito": "^24.3.0",
+    "@taquito/utils": "^24.3.0",
+    "axios": "^1.17.0",
+    "bignumber.js": "^11.1.2",
+    "decimal.js": "^10.6.0",
+    "effector": "^23.4.4",
+    "effector-react": "^23.3.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@pandacss/dev": "^1.11.2",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "globals": "^17.6.0",
+    "typescript": "~6.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vite-plus": "latest"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+  },
+  "packageManager": "npm@11.16.0",
+  "allowScripts": {
+    "esbuild@0.25.12": true
+  }
+}

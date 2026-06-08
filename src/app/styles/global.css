@@ -1,0 +1,40 @@
+@layer reset, base, tokens, recipes, utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --color-surface: #121414;
+  --color-on-surface: #e2e2e2;
+  --color-surface-tint: #00e290;
+  --color-primary-container: #00ffa3;
+  --color-on-primary: #003920;
+  --color-outline-variant: #3a4a3f;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  color: var(--color-on-surface);
+  background: var(--color-surface);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-surface-tint);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.root {
+  isolation: isolate;
+}
