@@ -7,7 +7,7 @@ export const button = cva({
     justifyContent: "center",
     gap: "2",
     fontWeight: "600",
-    borderRadius: "token(radii.DEFAULT)",
+    borderRadius: "token(radii.full)",
     transition: "all 150ms ease",
     cursor: "pointer",
     outline: "none",
@@ -24,30 +24,46 @@ export const button = cva({
       primary: {
         bg: "token(colors.primary-container)",
         color: "token(colors.on-primary)",
-        _hover: { bg: "token(colors.primary-fixed)" },
+        _hover: { opacity: "0.85" },
+        _active: { transform: "scale(0.95)" },
       },
       ghost: {
-        bg: "transparent",
+        bg: "rgba(0, 255, 163, 0.08)",
         border: "1px solid token(colors.primary-container)",
         color: "token(colors.primary-container)",
-        _hover: { bg: "rgba(0, 255, 163, 0.08)" },
+        _hover: { bg: "rgba(0, 255, 163, 0.15)" },
+        _active: { transform: "scale(0.95)" },
       },
       danger: {
         bg: "token(colors.error-container)",
         color: "token(colors.on-error-container)",
         _hover: { opacity: "0.9" },
+        _active: { transform: "scale(0.95)" },
+      },
+      icon: {
+        bg: "transparent",
+        border: "none",
+        color: "token(colors.on-surface-variant)",
+        px: "0",
+        _hover: { bg: "rgba(255, 255, 255, 0.08)", color: "token(colors.on-surface)" },
+        _active: { transform: "scale(0.95)" },
       },
     },
     size: {
-      sm: { h: "32px", px: "3", fontSize: "14px" },
-      md: { h: "40px", px: "4", fontSize: "16px" },
-      lg: { h: "48px", px: "6", fontSize: "18px" },
+      sm: { px: "4", py: "2", fontSize: "14px" },
+      md: { px: "5", py: "2.5", fontSize: "16px" },
+      lg: { px: "6", py: "3", fontSize: "18px" },
     },
   },
   defaultVariants: {
     variant: "primary",
     size: "md",
   },
+  compoundVariants: [
+    { variant: "icon", size: "sm", css: { width: "28px", height: "28px" } },
+    { variant: "icon", size: "md", css: { width: "36px", height: "36px" } },
+    { variant: "icon", size: "lg", css: { width: "44px", height: "44px" } },
+  ],
 });
 
 export const card = cva({
@@ -60,10 +76,21 @@ export const card = cva({
     display: "flex",
     flexDirection: "column",
     gap: "token(spacing.sm)",
-    transition: "all 200ms ease",
-    _hover: {
-      bg: "rgba(40, 42, 42, 0.7)",
+  },
+  variants: {
+    interactive: {
+      true: {
+        transition: "all 200ms ease",
+        cursor: "pointer",
+        _hover: {
+          bg: "rgba(40, 42, 42, 0.7)",
+        },
+      },
+      false: {},
     },
+  },
+  defaultVariants: {
+    interactive: false,
   },
 });
 
@@ -86,6 +113,25 @@ export const input = cva({
     _placeholder: {
       color: "token(colors.on-surface-variant)",
     },
+  },
+});
+
+export const skeleton = cva({
+  base: {
+    bg: "rgba(255, 255, 255, 0.06)",
+    borderRadius: "token(radii.DEFAULT)",
+    animation: "skeleton-pulse 1.5s ease-in-out infinite",
+  },
+  variants: {
+    shape: {
+      text: { height: "14px", width: "60%" },
+      heading: { height: "22px", width: "40%" },
+      circle: { borderRadius: "token(radii.full)", width: "40px", height: "40px" },
+      block: { height: "48px", width: "100%" },
+    },
+  },
+  defaultVariants: {
+    shape: "text",
   },
 });
 
@@ -125,7 +171,7 @@ export const progressTrack = cva({
     bg: "token(colors.surface-container-highest)",
     borderRadius: "token(radii.full)",
     overflow: "hidden",
-    height: "8px",
+    height: "4px",
     width: "100%",
   },
 });

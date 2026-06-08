@@ -4,7 +4,7 @@ import type { ReactNode, ComponentPropsWithoutRef } from "react";
 
 interface ButtonProps {
   children: ReactNode;
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "ghost" | "danger" | "icon";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   disabled?: boolean;

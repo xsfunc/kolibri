@@ -7,6 +7,12 @@ export default defineConfig({
 
   theme: {
     extend: {
+      breakpoints: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+      },
       tokens: {
         colors: {
           surface: { value: "#121414" },
@@ -182,4 +188,10 @@ export default defineConfig({
   },
 
   outdir: "styled-system",
+  globalCss: {
+    "@keyframes skeleton-pulse": {
+      "0%, 100%": { opacity: "1" },
+      "50%": { opacity: "0.4" },
+    },
+  },
 });

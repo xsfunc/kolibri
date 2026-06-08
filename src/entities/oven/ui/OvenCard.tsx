@@ -1,24 +1,39 @@
 import { useUnit } from "effector-react";
-import { $ownedOvens } from "../model/model";
+import { $ownedOvens, $ovenHealthMap, type HealthLevel } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
-import { card, chip } from "@/shared/ui/styles";
+import { card } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import { Button } from "@/shared/ui/Button";
 import { Progress } from "@/shared/ui/Progress";
 import { truncateAddress } from "@/shared/lib/format";
+import { Flame } from "lucide-react";
 
 interface OvenCardProps {
   ovenAddress: string;
   onAction: (action: string) => void;
 }
 
+const borderColors: Record<HealthLevel, string> = {
+  safe: "token(colors.primary-fixed-dim)",
+  warning: "token(colors.tertiary-fixed-dim)",
+  danger: "token(colors.error)",
+};
+
+const healthColors: Record<HealthLevel, string> = {
+  safe: "token(colors.primary-fixed-dim)",
+  warning: "token(colors.tertiary-fixed-dim)",
+  danger: "token(colors.error)",
+};
+
 export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
-  const { ovens, refreshingAddress } = useUnit({
+  const { ovens, refreshingAddress, healthMap } = useUnit({
     ovens: $ownedOvens,
     refreshingAddress: $refreshingOvenAddress,
+    healthMap: $ovenHealthMap,
   });
   const oven = ovens?.[ovenAddress];
   const isRefreshing = refreshingAddress === ovenAddress;
+  const health = healthMap[ovenAddress];
 
   if (!oven) {
     return (
@@ -37,6 +52,8 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
     );
   }
 
+  const healthLevel: HealthLevel = health?.level ?? "safe";
+  const healthFactor = health?.factor;
   const collateralLevel =
     oven.outstandingTokens.isZero() || oven.balance.isZero()
       ? ("safe" as const)
@@ -46,156 +63,145 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           ? ("warning" as const)
           : ("safe" as const);
 
+  const collateralPct = oven.balance.isZero()
+    ? 0
+    : Math.min(
+        100,
+        Math.round((1 - oven.outstandingTokens.dividedBy(oven.balance).toNumber()) * 100),
+      );
+
   return (
-    <div className={card()}>
+    <div
+      className={card()}
+      style={{ borderLeftWidth: "4px", borderLeftColor: borderColors[healthLevel] }}
+    >
       <div
         className={css({
-          textStyle: "label-md",
-          color: "token(colors.on-surface-variant)",
-          fontFamily: "monospace",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "token(spacing.lg)",
         })}
       >
-        {truncateAddress(ovenAddress)}
-      </div>
-
-      {oven.isLiquidated && <div className={chip({ color: "error" })}>Liquidated</div>}
-
-      <div className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.xs)" })}>
-        <div
-          className={css({
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-            paddingBottom: "token(spacing.xs)",
-          })}
-        >
-          <span
-            className={css({ textStyle: "label-md", color: "token(colors.on-surface-variant)" })}
+        <div>
+          <h4
+            className={css({
+              textStyle: "headline-sm",
+              fontWeight: "700",
+              margin: "0",
+            })}
           >
-            Balance
+            Oven {truncateAddress(ovenAddress)}
+          </h4>
+          <p
+            className={css({
+              textStyle: "body-sm",
+              color: "token(colors.on-surface-variant)",
+              margin: "0",
+            })}
+          >
+            {oven.isLiquidated ? "Liquidated" : "Active Lending Position"}
+          </p>
+        </div>
+        <div className={css({ display: "flex", flexDirection: "column", alignItems: "flex-end" })}>
+          <span
+            className={css({
+              textStyle: "label-md",
+              color: "token(colors.on-surface-variant)",
+            })}
+          >
+            Health Factor
           </span>
           <span
             className={css({
+              textStyle: "headline-sm",
+              fontWeight: "700",
+              color: healthColors[healthLevel],
+            })}
+          >
+            {healthFactor ? healthFactor.toFixed(1) : "—"}
+          </span>
+        </div>
+      </div>
+
+      <div
+        className={css({
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "token(spacing.md)",
+          marginBottom: "token(spacing.lg)",
+        })}
+      >
+        <div
+          className={css({
+            bg: "token(colors.surface-container-low)",
+            padding: "token(spacing.sm)",
+            borderRadius: "token(radii.DEFAULT)",
+            border: "1px solid rgba(255, 255, 255, 0.05)",
+          })}
+        >
+          <p
+            className={css({
+              textStyle: "label-sm",
+              color: "token(colors.on-surface-variant)",
+              marginBottom: "token(spacing.xs)",
+            })}
+          >
+            Collateral
+          </p>
+          <p
+            className={css({
               textStyle: "body-md",
               fontVariantNumeric: "tabular-nums",
-              textAlign: "right",
+              fontWeight: "600",
             })}
           >
             {oven.balance.dividedBy(1e6).toFixed(4)} XTZ
-          </span>
+          </p>
         </div>
         <div
           className={css({
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-            paddingBottom: "token(spacing.xs)",
+            bg: "token(colors.surface-container-low)",
+            padding: "token(spacing.sm)",
+            borderRadius: "token(radii.DEFAULT)",
+            border: "1px solid rgba(255, 255, 255, 0.05)",
           })}
         >
-          <span
-            className={css({ textStyle: "label-md", color: "token(colors.on-surface-variant)" })}
-          >
-            Borrowed
-          </span>
-          <span
+          <p
             className={css({
-              textStyle: "body-md",
-              fontVariantNumeric: "tabular-nums",
-              textAlign: "right",
+              textStyle: "label-sm",
+              color: "token(colors.on-surface-variant)",
+              marginBottom: "token(spacing.xs)",
             })}
           >
-            {oven.borrowedTokens.dividedBy(1e18).toFixed(2)} kUSD
-          </span>
-        </div>
-        <div
-          className={css({
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
-            paddingBottom: "token(spacing.xs)",
-          })}
-        >
-          <span
-            className={css({ textStyle: "label-md", color: "token(colors.on-surface-variant)" })}
-          >
-            Outstanding
-          </span>
-          <span
+            Debt
+          </p>
+          <p
             className={css({
               textStyle: "body-md",
               fontVariantNumeric: "tabular-nums",
-              textAlign: "right",
+              fontWeight: "600",
             })}
           >
             {oven.outstandingTokens.dividedBy(1e18).toFixed(2)} kUSD
-          </span>
-        </div>
-        <div className={css({ display: "flex", justifyContent: "space-between" })}>
-          <span
-            className={css({ textStyle: "label-md", color: "token(colors.on-surface-variant)" })}
-          >
-            Baker
-          </span>
-          <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface)" })}>
-            {oven.baker ?? "None"}
-          </span>
+          </p>
         </div>
       </div>
 
-      <Progress
-        value={oven.outstandingTokens.isZero() ? 0 : 50}
-        max={100}
-        level={collateralLevel}
-        label="Collateral ratio"
-      />
-
-      <div className={css({ display: "flex", gap: "token(spacing.xs)", flexWrap: "wrap" })}>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onAction("deposit")}
-          disabled={isRefreshing}
-          aria-label={`Deposit to oven ${truncateAddress(ovenAddress)}`}
-        >
-          Deposit
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onAction("withdraw")}
-          disabled={isRefreshing}
-          aria-label={`Withdraw from oven ${truncateAddress(ovenAddress)}`}
-        >
-          Withdraw
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onAction("borrow")}
-          disabled={isRefreshing}
-          aria-label={`Borrow from oven ${truncateAddress(ovenAddress)}`}
-        >
-          Borrow
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onAction("repay")}
-          disabled={isRefreshing}
-          aria-label={`Repay to oven ${truncateAddress(ovenAddress)}`}
-        >
-          Repay
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onAction("baker")}
-          disabled={isRefreshing}
-          aria-label={`Set baker for oven ${truncateAddress(ovenAddress)}`}
-        >
-          Set Baker
-        </Button>
+      <div className={css({ marginBottom: "token(spacing.lg)" })}>
+        <Progress value={collateralPct} max={100} level={collateralLevel} />
       </div>
+
+      <Button
+        variant="ghost"
+        onClick={() => onAction("deposit")}
+        disabled={isRefreshing}
+        aria-label={`Manage oven ${truncateAddress(ovenAddress)}`}
+        className={css({ width: "100%" })}
+      >
+        <Flame size={16} />
+        Manage
+      </Button>
     </div>
   );
 };

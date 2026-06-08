@@ -16,6 +16,7 @@ import { Button } from "@/shared/ui/Button";
 import { Progress } from "@/shared/ui/Progress";
 import { css } from "../../../../styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
+import { RefreshCw } from "lucide-react";
 
 export const OvenList = () => {
   const { ovenList, loading, pending, pkh, load, progress, pendingAddresses } = useUnit({
@@ -61,7 +62,7 @@ export const OvenList = () => {
   }
 
   return (
-    <div className={css({ padding: "token(spacing.md) token(spacing.lg)" })}>
+    <div>
       <div
         className={css({
           display: "flex",
@@ -70,15 +71,29 @@ export const OvenList = () => {
           marginBottom: "token(spacing.lg)",
         })}
       >
-        <h2
-          className={css({
-            textStyle: "headline-md",
-            color: "token(colors.on-surface)",
-            margin: "0",
-          })}
-        >
-          Your Ovens
-        </h2>
+        <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
+          <h2
+            className={css({
+              textStyle: "headline-sm",
+              color: "token(colors.on-surface)",
+              fontWeight: "600",
+              margin: "0",
+            })}
+          >
+            My Ovens
+          </h2>
+          <span
+            className={css({
+              textStyle: "label-md",
+              color: "token(colors.primary-fixed-dim)",
+              bg: "rgba(0, 226, 144, 0.1)",
+              padding: "2px 8px",
+              borderRadius: "token(radii.full)",
+            })}
+          >
+            {ovenList.length} Active
+          </span>
+        </div>
         <Button
           variant="ghost"
           size="sm"
@@ -86,6 +101,7 @@ export const OvenList = () => {
           disabled={pending}
           loading={pending}
         >
+          <RefreshCw size={14} />
           Refresh
         </Button>
       </div>

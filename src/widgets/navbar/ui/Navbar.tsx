@@ -5,36 +5,47 @@ import { WalletInfo } from "@/features/connect-wallet/ui/WalletInfo";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { Button } from "@/shared/ui/Button";
 import { css } from "../../../../styled-system/css";
+import { Settings } from "lucide-react";
 
 export const Navbar = () => {
   const isConnected = useUnit($isConnected);
 
   return (
-    <nav
-      aria-label="Main"
+    <header
       className={css({
-        borderTop: "3px solid token(colors.primary-container)",
-        padding: "0 token(spacing.margin-desktop)",
+        position: "fixed",
+        top: "0",
+        width: "100%",
+        zIndex: "50",
+        bg: "rgba(18, 20, 20, 0.6)",
+        backdropFilter: "blur(24px)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        height: "56px",
+        height: "64px",
+        paddingLeft: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
+        paddingRight: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
       })}
     >
-      <span className={css({ textStyle: "headline-sm", color: "token(colors.surface-tint)" })}>
-        Kolibri
-      </span>
+      <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.xs)" })}>
+        <span
+          className={css({
+            textStyle: "headline-md",
+            color: "token(colors.primary-fixed-dim)",
+            fontWeight: "800",
+            letterSpacing: "-0.04em",
+          })}
+        >
+          KOLIBRI
+        </span>
+      </div>
       <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
         {isConnected ? <WalletInfo /> : <ConnectButton />}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => rpcSettingsOpened()}
-          aria-label="RPC settings"
-        >
-          ⚙
+        <Button variant="icon" onClick={() => rpcSettingsOpened()} aria-label="RPC settings">
+          <Settings size={18} />
         </Button>
       </div>
-    </nav>
+    </header>
   );
 };

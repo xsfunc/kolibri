@@ -8,6 +8,7 @@ export {
   $ovensAllLoaded,
   $ovensLoadProgress,
   $ovenAddressesPending,
+  $ovenHealthMap,
   ovensLoaded,
   ovenUpdated,
   ovenLoadProgress,
@@ -16,7 +17,7 @@ export {
   minterDataLoaded,
   ovensReset,
 } from "./model/model";
-export type { OvenData, PriceData, MinterData } from "./model/model";
+export type { OvenData, PriceData, MinterData, OvenHealth, HealthLevel } from "./model/model";
 export {
   loadOvensFx,
   refreshOvenFx,

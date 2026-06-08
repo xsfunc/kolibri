@@ -1,7 +1,9 @@
 import { useUnit } from "effector-react";
 import { connectWalletFx } from "../model/model";
+import { card } from "@/shared/ui/styles";
+import { css, cx } from "../../../../styled-system/css";
+import { Wallet } from "lucide-react";
 import { Button } from "@/shared/ui/Button";
-import { css } from "../../../../styled-system/css";
 
 export const ConnectPrompt = () => {
   const { connect, pending } = useUnit({
@@ -11,20 +13,59 @@ export const ConnectPrompt = () => {
 
   return (
     <section
-      className={css({ textAlign: "center", padding: "token(spacing.xl) token(spacing.lg)" })}
+      className={css({
+        display: "flex",
+        justifyContent: "center",
+        paddingTop: "token(spacing.xl)",
+      })}
     >
-      <h1
-        className={css({
-          textStyle: "headline-lg",
-          color: "token(colors.on-surface)",
-          marginBottom: "token(spacing.lg)",
-        })}
+      <div
+        className={card()}
+        style={{ maxWidth: "400px", width: "100%", alignItems: "center", textAlign: "center" }}
       >
-        Connect Your Wallet To Manage Your Ovens
-      </h1>
-      <Button variant="primary" size="lg" onClick={() => connect()} loading={pending}>
-        Connect Wallet
-      </Button>
+        <div
+          className={css({
+            width: "56px",
+            height: "56px",
+            borderRadius: "token(radii.full)",
+            bg: "rgba(0, 226, 144, 0.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "token(spacing.lg)",
+          })}
+        >
+          <Wallet size={28} className={cx(css({ color: "token(colors.primary-fixed-dim)" }))} />
+        </div>
+        <h2
+          className={css({
+            textStyle: "headline-sm",
+            color: "token(colors.on-surface)",
+            fontWeight: "600",
+            margin: "0 0 token(spacing.sm)",
+          })}
+        >
+          Connect Your Wallet
+        </h2>
+        <p
+          className={css({
+            textStyle: "body-sm",
+            color: "token(colors.on-surface-variant)",
+            margin: "0 0 token(spacing.lg)",
+          })}
+        >
+          To manage your ovens and view your positions
+        </p>
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={() => connect()}
+          loading={pending}
+          className={css({ width: "100%" })}
+        >
+          Connect Wallet
+        </Button>
+      </div>
     </section>
   );
 };

@@ -1,5 +1,5 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { dialogBackdrop, dialogPopup } from "@/shared/ui/styles";
+import { dialogBackdrop, dialogPopup, button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import type { ReactNode } from "react";
 
@@ -45,18 +45,8 @@ export const Dialog = ({ open, onClose, title, description, children }: DialogPr
         )}
         {children}
         <BaseDialog.Close
-          className={css({
-            position: "absolute",
-            top: "token(spacing.md)",
-            right: "token(spacing.md)",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "1.25rem",
-            lineHeight: "1",
-            color: "token(colors.on-surface-variant)",
-            _hover: { color: "token(colors.on-surface)" },
-          })}
+          className={button({ variant: "icon", size: "sm" })}
+          style={{ position: "absolute", top: "16px", right: "16px" }}
         >
           ✕
         </BaseDialog.Close>

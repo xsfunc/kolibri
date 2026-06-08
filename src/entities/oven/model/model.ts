@@ -1,4 +1,4 @@
-import { createStore, createEvent } from "effector";
+import { createStore, createEvent, combine } from "effector";
 import type BigNumber from "bignumber.js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -93,3 +93,30 @@ export const $ovenList = $ownedOvens.map((ovens) =>
 
 /** true while all ovens are loaded (false during incremental loading) */
 export const $ovensLoading = $ovensAllLoaded.map((loaded) => !loaded);
+
+export type HealthLevel = "safe" | "warning" | "danger";
+
+export interface OvenHealth {
+  factor: BigNumber | null;
+  level: HealthLevel;
+}
+
+function computeHealth(oven: OvenData, price: BigNumber | null): OvenHealth {
+  if (!price || oven.outstandingTokens.isZero()) {
+    return { factor: null, level: "safe" };
+  }
+  const collateralValue = oven.balance.dividedBy(1e6).multipliedBy(price);
+  const debtValue = oven.outstandingTokens.dividedBy(1e18);
+  const factor = collateralValue.dividedBy(debtValue);
+  const level: HealthLevel = factor.gt(1.8) ? "safe" : factor.gt(1.5) ? "warning" : "danger";
+  return { factor, level };
+}
+
+export const $ovenHealthMap = combine($ownedOvens, $priceData, (ovens, priceData) => {
+  if (!ovens || !priceData) return {} as Record<string, OvenHealth>;
+  const map: Record<string, OvenHealth> = {};
+  for (const [addr, oven] of Object.entries(ovens)) {
+    if (oven) map[addr] = computeHealth(oven, priceData.price);
+  }
+  return map;
+});
