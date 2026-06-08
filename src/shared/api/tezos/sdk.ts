@@ -2,11 +2,11 @@ import { TezosToolkit } from "@taquito/taquito";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
 import { CONTRACTS, HarbingerClient, StableCoinClient, TokenClient, Network } from "./kolibri";
 import { OvenClient } from "./kolibri";
+import { $rpcNode } from "./rpc";
 
-const NODE_URL = "https://rpc.tzkt.io/mainnet";
 const CONTRACTS_MAIN = CONTRACTS.MAIN;
 
-export const tezosToolkit = new TezosToolkit(NODE_URL);
+export const tezosToolkit = new TezosToolkit($rpcNode.defaultState);
 
 const harbingerClient = new HarbingerClient(
   tezosToolkit,
@@ -40,6 +40,10 @@ export function setWalletProvider(wallet: BeaconWallet): void {
 
 export function clearWalletProvider(): void {
   tezosToolkit.setWalletProvider(undefined as never);
+}
+
+export function clearOvenCache(): void {
+  ovenClientCache.clear();
 }
 
 export { stableCoinClient, tokenClient, CONTRACTS_MAIN as NETWORK_CONTRACTS };
