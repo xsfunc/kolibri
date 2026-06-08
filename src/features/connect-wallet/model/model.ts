@@ -1,7 +1,6 @@
 import { createEffect, sample, attach } from "effector";
 import { BeaconWallet } from "@taquito/beacon-wallet";
-import { BeaconEvent } from "@taquito/beacon-wallet";
-import { NetworkType } from "@ecadlabs/beacon-types";
+import { BeaconEvent, NetworkType } from "@taquito/beacon-wallet";
 import {
   walletConnected,
   walletConnecting,
