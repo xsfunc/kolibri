@@ -43,6 +43,11 @@ export const minterDataLoaded = createEvent<MinterData>();
 /** User disconnected — reset ovens */
 export const ovensReset = createEvent();
 
+/** Progress update during incremental oven loading */
+export const ovenLoadProgress = createEvent<{ loaded: number; total: number }>();
+
+export const ovenAddressesLoading = createEvent<string[]>();
+
 // ─── Stores ──────────────────────────────────────────────────────────────────
 
 export const $ownedOvens = createStore<Record<string, OvenData | null> | null>(null)
@@ -64,6 +69,21 @@ export const $minterData = createStore<MinterData>({
   privateLiquidationThreshold: null,
 }).on(minterDataLoaded, (_, data) => data);
 
+export const $ovensLoadProgress = createStore<{ loaded: number; total: number } | null>(null)
+  .on(ovenLoadProgress, (_, p) => p)
+  .on(ovensLoaded, () => null)
+  .on(ovensReset, () => null);
+
+export const $ovenAddressesPending = createStore<string[]>([])
+  .on(ovenAddressesLoading, (_, addrs) => addrs)
+  .on(ovensLoaded, () => [])
+  .on(ovensReset, () => []);
+
+export const $ovensAllLoaded = createStore<boolean>(true)
+  .on(ovenAddressesLoading, () => false)
+  .on(ovensLoaded, () => true)
+  .on(ovensReset, () => true);
+
 // ─── Derived ─────────────────────────────────────────────────────────────────
 
 /** Oven list as array (for list rendering) */
@@ -71,5 +91,5 @@ export const $ovenList = $ownedOvens.map((ovens) =>
   ovens ? Object.values(ovens).filter((o): o is OvenData => o !== null) : [],
 );
 
-/** true while ovens are not yet loaded */
-export const $ovensLoading = $ownedOvens.map((o) => o === null);
+/** true while all ovens are loaded (false during incremental loading) */
+export const $ovensLoading = $ovensAllLoaded.map((loaded) => !loaded);

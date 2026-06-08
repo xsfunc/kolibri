@@ -1,4 +1,4 @@
-import type { Address, Mutez, Shard } from "./types";
+import type { Address, Mutez, Shard, InterestData } from "./types";
 import { TezosToolkit, UnitValue } from "@taquito/taquito";
 import type { WalletProvider } from "@taquito/taquito";
 import HarbingerClient from "./harbinger-client";
@@ -39,6 +39,13 @@ export default class OvenClient {
     );
   }
 
+  public async getOvenStorage(): Promise<Record<string, unknown>> {
+    return (await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<
+      string,
+      unknown
+    >;
+  }
+
   public async getBaker(): Promise<Address | null> {
     try {
       return await this.tezos.rpc.getDelegate(this.ovenAddress);
@@ -67,25 +74,28 @@ export default class OvenClient {
   public async getTotalOutstandingTokens(
     time: Date = new Date(),
     ovenStorage?: Record<string, unknown>,
+    interestData?: InterestData,
   ): Promise<Shard> {
-    const stabilityFees = await this.getStabilityFees(time, ovenStorage);
-    const borrowedTokens = await this.getBorrowedTokens();
+    const stabilityFees = await this.getStabilityFees(time, ovenStorage, interestData);
+    const borrowedTokens = await this.getBorrowedTokens(ovenStorage);
     return stabilityFees.plus(borrowedTokens);
   }
 
   public async getStabilityFees(
     time: Date = new Date(),
     ovenStorage?: Record<string, unknown>,
+    interestData?: InterestData,
   ): Promise<Shard> {
     const resolvedOvenStorage =
       ovenStorage ??
       ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>);
     const stabilityFeeTokens: BigNumber = resolvedOvenStorage.stabilityFeeTokens as BigNumber;
 
-    const interestData = await this.stableCoinClient.getInterestData(time);
+    const resolvedInterestData =
+      interestData ?? (await this.stableCoinClient.getInterestData(time));
     const ovenInterestIndex: BigNumber = resolvedOvenStorage.interestIndex as BigNumber;
-    const borrowedTokens = await this.getBorrowedTokens(ovenStorage);
-    const minterInterestIndex: BigNumber = interestData.globalInterestIndex;
+    const borrowedTokens = await this.getBorrowedTokens(resolvedOvenStorage);
+    const minterInterestIndex: BigNumber = resolvedInterestData.globalInterestIndex;
 
     // Use ROUND_DOWN to match Michelson's EDIV (truncating integer division)
     const ratio = minterInterestIndex

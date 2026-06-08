@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useUnit } from "effector-react";
-import { $ovenList, $ovensLoading } from "@/entities/oven/model/model";
+import {
+  $ovenList,
+  $ovensLoading,
+  $ovensLoadProgress,
+  $ovenAddressesPending,
+} from "@/entities/oven/model/model";
 import { $ovensLoadPending } from "@/entities/oven/model/loadOvens";
 import { $walletPKH } from "@/entities/wallet/model/model";
 import { loadOvensFx } from "@/entities/oven/model/loadOvens";
@@ -8,16 +13,19 @@ import { OvenCard } from "@/entities/oven";
 import { OvenManageDialog } from "@/features/manage-oven";
 import { SetBakerDialog } from "@/features/set-baker";
 import { Button } from "@/shared/ui/Button";
+import { Progress } from "@/shared/ui/Progress";
 import { css } from "../../../../styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 
 export const OvenList = () => {
-  const { ovenList, loading, pending, pkh, load } = useUnit({
+  const { ovenList, loading, pending, pkh, load, progress, pendingAddresses } = useUnit({
     ovenList: $ovenList,
     loading: $ovensLoading,
     pending: $ovensLoadPending,
     pkh: $walletPKH,
     load: loadOvensFx,
+    progress: $ovensLoadProgress,
+    pendingAddresses: $ovenAddressesPending,
   });
 
   const [manageOven, setManageOven] = useState<string | null>(null);
@@ -37,7 +45,7 @@ export const OvenList = () => {
     if (pkh) void load(pkh);
   };
 
-  if (loading && ovenList.length === 0) {
+  if (loading && ovenList.length === 0 && !progress) {
     return (
       <div
         className={css({
@@ -82,7 +90,7 @@ export const OvenList = () => {
         </Button>
       </div>
 
-      {ovenList.length === 0 ? (
+      {ovenList.length === 0 && !progress ? (
         <p className={css({ color: "token(colors.on-surface-variant)", textStyle: "body-md" })}>
           No ovens found. Create one to get started.
         </p>
@@ -100,6 +108,22 @@ export const OvenList = () => {
               onAction={(action) => handleAction(oven.ovenAddress, action)}
             />
           ))}
+          {pendingAddresses
+            .filter((addr) => !ovenList.some((o) => o.ovenAddress === addr))
+            .map((addr) => (
+              <OvenCard key={addr} ovenAddress={addr} onAction={() => {}} />
+            ))}
+        </div>
+      )}
+
+      {progress && progress.total > 0 && (
+        <div className={css({ marginTop: "token(spacing.md)" })}>
+          <Progress
+            value={progress.loaded}
+            max={progress.total}
+            level="safe"
+            label={`Loading ovens… ${progress.loaded}/${progress.total}`}
+          />
         </div>
       )}
 

@@ -21,8 +21,15 @@ export const stableCoinClient = new StableCoinClient(
 
 export const tokenClient = new TokenClient(NODE_URL, CONTRACTS_MAIN.TOKEN!);
 
-export const getOvenClient = (wallet: BeaconWallet, ovenAddress: string): OvenClient =>
-  new OvenClient(NODE_URL, wallet, ovenAddress, stableCoinClient, harbingerClient);
+const ovenClientCache = new Map<string, OvenClient>();
+
+export const getOvenClient = (wallet: BeaconWallet, ovenAddress: string): OvenClient => {
+  const cached = ovenClientCache.get(ovenAddress);
+  if (cached) return cached;
+  const client = new OvenClient(NODE_URL, wallet, ovenAddress, stableCoinClient, harbingerClient);
+  ovenClientCache.set(ovenAddress, client);
+  return client;
+};
 
 // ─── Minter data helper ───────────────────────────────────────────────────────
 

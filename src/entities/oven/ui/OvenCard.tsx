@@ -1,5 +1,6 @@
 import { useUnit } from "effector-react";
 import { $ownedOvens } from "../model/model";
+import { $refreshingOvenAddress } from "../model/loadOvens";
 import { card, chip } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import { Button } from "@/shared/ui/Button";
@@ -12,10 +13,29 @@ interface OvenCardProps {
 }
 
 export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
-  const ovens = useUnit($ownedOvens);
+  const { ovens, refreshingAddress } = useUnit({
+    ovens: $ownedOvens,
+    refreshingAddress: $refreshingOvenAddress,
+  });
   const oven = ovens?.[ovenAddress];
+  const isRefreshing = refreshingAddress === ovenAddress;
 
-  if (!oven) return null;
+  if (!oven) {
+    return (
+      <div className={card()}>
+        <div
+          className={css({
+            textStyle: "label-md",
+            color: "token(colors.on-surface-variant)",
+            fontFamily: "monospace",
+          })}
+        >
+          {truncateAddress(ovenAddress)}
+        </div>
+        <div className={css({ opacity: 0.5, textStyle: "body-sm" })}>Loading oven data…</div>
+      </div>
+    );
+  }
 
   const collateralLevel =
     oven.outstandingTokens.isZero() || oven.balance.isZero()
@@ -134,6 +154,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onAction("deposit")}
+          disabled={isRefreshing}
           aria-label={`Deposit to oven ${truncateAddress(ovenAddress)}`}
         >
           Deposit
@@ -142,6 +163,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onAction("withdraw")}
+          disabled={isRefreshing}
           aria-label={`Withdraw from oven ${truncateAddress(ovenAddress)}`}
         >
           Withdraw
@@ -150,6 +172,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onAction("borrow")}
+          disabled={isRefreshing}
           aria-label={`Borrow from oven ${truncateAddress(ovenAddress)}`}
         >
           Borrow
@@ -158,6 +181,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onAction("repay")}
+          disabled={isRefreshing}
           aria-label={`Repay to oven ${truncateAddress(ovenAddress)}`}
         >
           Repay
@@ -166,6 +190,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           variant="ghost"
           size="sm"
           onClick={() => onAction("baker")}
+          disabled={isRefreshing}
           aria-label={`Set baker for oven ${truncateAddress(ovenAddress)}`}
         >
           Set Baker

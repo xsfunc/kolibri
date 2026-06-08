@@ -1,8 +1,12 @@
-import { createEffect, sample, attach } from "effector";
+import { createEffect, createStore, sample, attach } from "effector";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
+import type { InterestData } from "@/shared/api/tezos/kolibri/types";
 import {
   ovensLoaded,
   ovenUpdated,
+  ovenLoadProgress,
+  ovenAddressesLoading,
+  ovensReset,
   priceDataLoaded,
   minterDataLoaded,
   type OvenData,
@@ -18,15 +22,20 @@ import { $wallet } from "@/entities/wallet/model/model";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function fetchSingleOven(wallet: BeaconWallet, ovenAddress: string): Promise<OvenData> {
+async function fetchSingleOven(
+  wallet: BeaconWallet,
+  ovenAddress: string,
+  interestData: InterestData,
+): Promise<OvenData> {
   const client = getOvenClient(wallet, ovenAddress);
-  const [baker, balance, borrowedTokens, stabilityFee, isLiquidated] = await Promise.all([
-    client.getBaker(),
-    client.getBalance(),
-    client.getBorrowedTokens(),
-    client.getStabilityFees(),
-    client.isLiquidated(),
-  ]);
+
+  const ovenStorage = await client.getOvenStorage();
+
+  const [baker, balance] = await Promise.all([client.getBaker(), client.getBalance()]);
+
+  const borrowedTokens = await client.getBorrowedTokens(ovenStorage);
+  const stabilityFee = await client.getStabilityFees(new Date(), ovenStorage, interestData);
+  const isLiquidated = await client.isLiquidated(ovenStorage);
 
   const outstandingTokens = borrowedTokens.plus(stabilityFee);
 
@@ -47,21 +56,31 @@ async function fetchSingleOven(wallet: BeaconWallet, ovenAddress: string): Promi
 const loadOvensRawFx = createEffect(
   async ({ pkh, wallet }: { pkh: string; wallet: BeaconWallet }) => {
     const addresses: string[] = await stableCoinClient.ovensOwnedByAddress(pkh);
+    const total = addresses.length;
 
-    const ovens = await Promise.all(
-      addresses.map(async (addr) => {
-        const data = await fetchSingleOven(wallet, addr);
-        return { ...data, ovenOwner: pkh };
-      }),
-    );
+    ovenAddressesLoading(addresses);
+    ovenLoadProgress({ loaded: 0, total });
 
-    return Object.fromEntries(ovens.map((o) => [o.ovenAddress, o]));
+    const interestData = await stableCoinClient.getInterestData();
+
+    const result: Record<string, OvenData> = {};
+
+    for (let i = 0; i < addresses.length; i++) {
+      const data = await fetchSingleOven(wallet, addresses[i], interestData);
+      const oven = { ...data, ovenOwner: pkh };
+      result[addresses[i]] = oven;
+      ovenUpdated({ address: addresses[i], data: oven });
+      ovenLoadProgress({ loaded: i + 1, total });
+    }
+
+    return result;
   },
 );
 
 const refreshOvenRawFx = createEffect(
   async ({ ovenAddress, wallet }: { ovenAddress: string; wallet: BeaconWallet }) => {
-    const data = await fetchSingleOven(wallet, ovenAddress);
+    const interestData = await stableCoinClient.getInterestData();
+    const data = await fetchSingleOven(wallet, ovenAddress, interestData);
     return { address: ovenAddress, data };
   },
 );
@@ -127,3 +146,14 @@ sample({
 
 export const $ovensLoadPending = loadOvensFx.pending;
 export const $globalDataPending = loadGlobalDataFx.pending;
+
+export const $refreshingOvenAddress = createStore<string | null>(null)
+  .on(refreshOvenFx, (_, ovenAddress) => ovenAddress)
+  .on(refreshOvenFx.done, () => null)
+  .on(refreshOvenFx.fail, () => null)
+  .on(ovensReset, () => null);
+
+sample({
+  clock: loadOvensFx.fail,
+  target: ovensReset,
+});

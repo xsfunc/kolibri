@@ -10,6 +10,7 @@ import type Decimal from "decimal.js";
 
 export default class StableCoinClient {
   private readonly tezos: TezosToolkit;
+  private minterStorageCache: Record<string, unknown> | null = null;
 
   public constructor(
     nodeUrl: string,
@@ -33,42 +34,37 @@ export default class StableCoinClient {
     return ovenFactoryContract.methodsObject.makeOven(UnitValue).send();
   }
 
-  public async getStabilityFeeApy(): Promise<Decimal> {
+  private async getMinterStorage(): Promise<Record<string, unknown>> {
+    if (this.minterStorageCache) return this.minterStorageCache;
     const minterContract = await this.tezos.contract.at(this.minterAddress);
-    const minterStorage: Record<string, unknown> = (await minterContract.storage()) as Record<
-      string,
-      unknown
-    >;
-    const stabilityFee = (await minterStorage.stabilityFee) as BigNumber;
+    this.minterStorageCache = (await minterContract.storage()) as Record<string, unknown>;
+    return this.minterStorageCache;
+  }
+
+  public clearCache(): void {
+    this.minterStorageCache = null;
+  }
+
+  public async getStabilityFeeApy(): Promise<Decimal> {
+    const minterStorage = await this.getMinterStorage();
+    const stabilityFee = minterStorage.stabilityFee as BigNumber;
     return interestRateToApy(stabilityFee);
   }
 
   public async getSimpleStabilityFee(): Promise<Shard> {
-    const minterContract = await this.tezos.contract.at(this.minterAddress);
-    const minterStorage: Record<string, unknown> = (await minterContract.storage()) as Record<
-      string,
-      unknown
-    >;
-    return (await minterStorage.stabilityFee) as Shard;
+    const minterStorage = await this.getMinterStorage();
+    return minterStorage.stabilityFee as Shard;
   }
 
   public async getRequiredCollateralizationRatio(): Promise<Shard> {
-    const minterContract = await this.tezos.contract.at(this.minterAddress);
-    const minterStorage: Record<string, unknown> = (await minterContract.storage()) as Record<
-      string,
-      unknown
-    >;
-    return (await minterStorage.collateralizationPercentage) as Shard;
+    const minterStorage = await this.getMinterStorage();
+    return minterStorage.collateralizationPercentage as Shard;
   }
 
   public async getInterestData(time: Date = new Date()): Promise<InterestData> {
-    const minterContract = await this.tezos.contract.at(this.minterAddress);
-    const minterStorage: Record<string, unknown> = (await minterContract.storage()) as Record<
-      string,
-      unknown
-    >;
+    const minterStorage = await this.getMinterStorage();
 
-    const globalInterestIndex: BigNumber = (await minterStorage.interestIndex) as BigNumber;
+    const globalInterestIndex: BigNumber = minterStorage.interestIndex as BigNumber;
 
     const raw = (await minterStorage.lastInterestIndexUpdateTime) as string;
     const lastUpdateTime = new Date(`${raw}`);
@@ -77,7 +73,7 @@ export default class StableCoinClient {
     const deltaSecs = Math.floor(deltaMs / 1000);
     const numPeriods = Math.floor(deltaSecs / CONSTANTS.COMPOUND_PERIOD_SECONDS);
 
-    const simpleStabilityFee = await this.getSimpleStabilityFee();
+    const simpleStabilityFee = minterStorage.stabilityFee as Shard;
 
     const globalInterestIndexApproximation = compoundingLinearApproximation(
       globalInterestIndex,
