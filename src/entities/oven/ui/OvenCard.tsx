@@ -7,7 +7,7 @@ import {
   type HealthLevel,
 } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
-import { card } from "@/shared/ui/styles";
+import { card, skeleton } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
@@ -50,17 +50,123 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
 
   if (!oven) {
     return (
-      <div className={card()}>
+      <div
+        className={card()}
+        style={{ borderLeftWidth: "4px", borderLeftColor: "rgba(255,255,255,0.08)" }}
+      >
         <div
           className={css({
-            textStyle: "label-md",
-            color: "token(colors.on-surface-variant)",
-            fontFamily: "monospace",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: "token(spacing.md)",
           })}
         >
-          {truncateAddress(ovenAddress)}
+          <div>
+            <h4
+              className={css({
+                textStyle: "body-sm",
+                fontWeight: "700",
+                margin: "0",
+                fontFamily: "monospace",
+              })}
+            >
+              {truncateAddress(ovenAddress)}
+            </h4>
+            <div className={skeleton({ shape: "text" })} style={{ marginTop: "4px" }} />
+          </div>
         </div>
-        <div className={css({ opacity: 0.5, textStyle: "body-sm" })}>Loading oven data…</div>
+
+        <div className={skeleton({ shape: "text" })} style={{ width: "50%" }} />
+
+        <div
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+            gap: "2px",
+            marginBottom: "token(spacing.sm)",
+          })}
+        >
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            })}
+          >
+            <div className={skeleton({ shape: "text" })} style={{ width: "45%" }} />
+            <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+          </div>
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            })}
+          >
+            <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+          </div>
+        </div>
+
+        <div
+          className={skeleton({ shape: "block" })}
+          style={{
+            height: "4px",
+            borderRadius: "token(radii.full)",
+            marginBottom: "token(spacing.sm)",
+          }}
+        />
+
+        <div
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+            gap: "2px",
+            marginBottom: "token(spacing.md)",
+          })}
+        >
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingY: "3px",
+              borderBottom: "1px solid rgba(255,255,255,0.05)",
+            })}
+          >
+            <div className={skeleton({ shape: "text" })} style={{ width: "40%" }} />
+            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+          </div>
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingY: "3px",
+              borderBottom: "1px solid rgba(255,255,255,0.05)",
+            })}
+          >
+            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+            <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+          </div>
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingY: "3px",
+            })}
+          >
+            <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+          </div>
+        </div>
+
+        <div
+          className={skeleton({ shape: "block" })}
+          style={{ height: "28px", borderRadius: "token(radii.full)" }}
+        />
       </div>
     );
   }
@@ -294,3 +400,115 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
     </div>
   );
 };
+
+export const SkeletonOvenCard = () => (
+  <div
+    className={card()}
+    style={{ borderLeftWidth: "4px", borderLeftColor: "rgba(255,255,255,0.08)" }}
+  >
+    <div
+      className={css({
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        marginBottom: "token(spacing.md)",
+      })}
+    >
+      <div>
+        <div className={skeleton({ shape: "heading" })} />
+        <div className={skeleton({ shape: "text" })} style={{ marginTop: "4px" }} />
+      </div>
+    </div>
+
+    <div className={skeleton({ shape: "text" })} style={{ width: "50%" }} />
+
+    <div
+      className={css({
+        display: "flex",
+        flexDirection: "column",
+        gap: "2px",
+        marginBottom: "token(spacing.sm)",
+      })}
+    >
+      <div
+        className={css({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        })}
+      >
+        <div className={skeleton({ shape: "text" })} style={{ width: "45%" }} />
+        <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+      </div>
+      <div
+        className={css({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        })}
+      >
+        <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+      </div>
+    </div>
+
+    <div
+      className={skeleton({ shape: "block" })}
+      style={{
+        height: "4px",
+        borderRadius: "token(radii.full)",
+        marginBottom: "token(spacing.sm)",
+      }}
+    />
+
+    <div
+      className={css({
+        display: "flex",
+        flexDirection: "column",
+        gap: "2px",
+        marginBottom: "token(spacing.md)",
+      })}
+    >
+      <div
+        className={css({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingY: "3px",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+        })}
+      >
+        <div className={skeleton({ shape: "text" })} style={{ width: "40%" }} />
+        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+      </div>
+      <div
+        className={css({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingY: "3px",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+        })}
+      >
+        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+        <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+      </div>
+      <div
+        className={css({
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingY: "3px",
+        })}
+      >
+        <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+      </div>
+    </div>
+
+    <div
+      className={skeleton({ shape: "block" })}
+      style={{ height: "28px", borderRadius: "token(radii.full)" }}
+    />
+  </div>
+);

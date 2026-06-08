@@ -46,23 +46,24 @@ export const OvenList = () => {
     if (pkh) void load(pkh);
   };
 
-  if (loading && ovenList.length === 0 && !progress) {
-    return (
-      <div
-        className={css({
-          padding: "token(spacing.xl)",
-          textAlign: "center",
-          color: "token(colors.on-surface-variant)",
-          textStyle: "body-md",
-        })}
-      >
-        Loading your ovens…
-      </div>
-    );
-  }
+  const hasAddresses = pendingAddresses.length > 0 || progress !== null;
 
   return (
     <div>
+      {progress && progress.total > 0 && (
+        <div
+          className={css({
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+          })}
+        >
+          <Progress value={progress.loaded} max={progress.total} level="safe" />
+        </div>
+      )}
+
       <div
         className={css({
           display: "flex",
@@ -94,19 +95,15 @@ export const OvenList = () => {
             {ovenList.length} Active
           </span>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          disabled={pending}
-          loading={pending}
-        >
+        <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={pending}>
           <RefreshCw size={14} />
-          Refresh
+          {pending && progress && progress.total > 0
+            ? `${progress.loaded}/${progress.total}`
+            : "Refresh"}
         </Button>
       </div>
 
-      {ovenList.length === 0 && !progress ? (
+      {ovenList.length === 0 && !hasAddresses && !loading ? (
         <p className={css({ color: "token(colors.on-surface-variant)", textStyle: "body-md" })}>
           No ovens found. Create one to get started.
         </p>
@@ -129,17 +126,6 @@ export const OvenList = () => {
             .map((addr) => (
               <OvenCard key={addr} ovenAddress={addr} onAction={() => {}} />
             ))}
-        </div>
-      )}
-
-      {progress && progress.total > 0 && (
-        <div className={css({ marginTop: "token(spacing.md)" })}>
-          <Progress
-            value={progress.loaded}
-            max={progress.total}
-            level="safe"
-            label={`Loading ovens… ${progress.loaded}/${progress.total}`}
-          />
         </div>
       )}
 

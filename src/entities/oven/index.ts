@@ -1,4 +1,4 @@
-export { OvenCard } from "./ui/OvenCard";
+export { OvenCard, SkeletonOvenCard } from "./ui/OvenCard";
 export {
   $ownedOvens,
   $priceData,
