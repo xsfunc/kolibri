@@ -3,8 +3,6 @@ import BigNumber from "bignumber.js";
 export type Address = string;
 export type Mutez = BigNumber;
 export type Shard = BigNumber;
-export type OperationHash = string;
-
 export type DeployedContractAddressOrNull = string | null;
 
 export type ContractGroup = {

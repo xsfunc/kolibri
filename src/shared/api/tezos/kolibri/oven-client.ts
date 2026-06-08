@@ -1,28 +1,24 @@
 import type { Address, Mutez, Shard, InterestData } from "./types";
-import { TezosToolkit, UnitValue } from "@taquito/taquito";
-import type { WalletProvider } from "@taquito/taquito";
-import HarbingerClient from "./harbinger-client";
-import StableCoinClient from "./stable-coin-client";
+import { UnitValue } from "@taquito/taquito";
+import type { TezosToolkit } from "@taquito/taquito";
+import type HarbingerClient from "./harbinger-client";
+import type StableCoinClient from "./stable-coin-client";
 import BigNumber from "bignumber.js";
-
-const MUTEZ_DIGITS = 6;
-const SHARD_DIGITS = 18;
-const MUTEZ_TO_SHARD = new BigNumber(Math.pow(10, SHARD_DIGITS - MUTEZ_DIGITS));
-const SHARD_PRECISION = new BigNumber(Math.pow(10, SHARD_DIGITS));
+import { SHARD, MUTEZ_TO_SHARD } from "@/shared/config/constants";
 
 export default class OvenClient {
-  private readonly tezos: TezosToolkit;
-
   public constructor(
-    nodeUrl: string,
-    wallet: WalletProvider,
+    private readonly tezos: TezosToolkit,
     public readonly ovenAddress: Address,
     public readonly stableCoinClient: StableCoinClient,
     public readonly harbingerClient: HarbingerClient,
-  ) {
-    const tezos = new TezosToolkit(nodeUrl);
-    tezos.setWalletProvider(wallet);
-    this.tezos = tezos;
+  ) {}
+
+  private async resolveStorage(cache?: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return (
+      cache ??
+      ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>)
+    );
   }
 
   public async getCollateralUtilization(): Promise<Shard> {
@@ -32,10 +28,10 @@ export default class OvenClient {
     const collateralValue = currentBalance
       .multipliedBy(MUTEZ_TO_SHARD)
       .multipliedBy(priceShard)
-      .dividedBy(SHARD_PRECISION);
+      .dividedBy(SHARD);
     const totalBorrowedTokens = await this.getTotalOutstandingTokens();
     return new BigNumber(
-      totalBorrowedTokens.times(Math.pow(10, SHARD_DIGITS)).dividedBy(collateralValue).toFixed(0),
+      totalBorrowedTokens.times(SHARD).dividedBy(collateralValue).toFixed(0, BigNumber.ROUND_DOWN),
     );
   }
 
@@ -58,17 +54,13 @@ export default class OvenClient {
   }
 
   public async getOwner(ovenStorage?: Record<string, unknown>): Promise<Address> {
-    const resolvedOvenStorage =
-      ovenStorage ??
-      ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>);
-    return resolvedOvenStorage.owner as Address;
+    const storage = await this.resolveStorage(ovenStorage);
+    return storage.owner as Address;
   }
 
   public async getBorrowedTokens(ovenStorage?: Record<string, unknown>): Promise<Shard> {
-    const resolvedOvenStorage =
-      ovenStorage ??
-      ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>);
-    return resolvedOvenStorage.borrowedTokens as Shard;
+    const storage = await this.resolveStorage(ovenStorage);
+    return storage.borrowedTokens as Shard;
   }
 
   public async getTotalOutstandingTokens(
@@ -86,35 +78,30 @@ export default class OvenClient {
     ovenStorage?: Record<string, unknown>,
     interestData?: InterestData,
   ): Promise<Shard> {
-    const resolvedOvenStorage =
-      ovenStorage ??
-      ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>);
-    const stabilityFeeTokens: BigNumber = resolvedOvenStorage.stabilityFeeTokens as BigNumber;
+    const storage = await this.resolveStorage(ovenStorage);
+    const stabilityFeeTokens: BigNumber = storage.stabilityFeeTokens as BigNumber;
 
     const resolvedInterestData =
       interestData ?? (await this.stableCoinClient.getInterestData(time));
-    const ovenInterestIndex: BigNumber = resolvedOvenStorage.interestIndex as BigNumber;
-    const borrowedTokens = await this.getBorrowedTokens(resolvedOvenStorage);
+    const ovenInterestIndex: BigNumber = storage.interestIndex as BigNumber;
+    const borrowedTokens = await this.getBorrowedTokens(storage);
     const minterInterestIndex: BigNumber = resolvedInterestData.globalInterestIndex;
 
-    // Use ROUND_DOWN to match Michelson's EDIV (truncating integer division)
     const ratio = minterInterestIndex
-      .times(SHARD_PRECISION)
+      .times(SHARD)
       .div(ovenInterestIndex)
       .integerValue(BigNumber.ROUND_DOWN);
     const totalPrinciple = borrowedTokens.plus(stabilityFeeTokens);
     const newTotalTokens = ratio
       .times(totalPrinciple)
-      .div(SHARD_PRECISION)
+      .div(SHARD)
       .integerValue(BigNumber.ROUND_DOWN);
     return newTotalTokens.minus(borrowedTokens);
   }
 
   public async isLiquidated(ovenStorage?: Record<string, unknown>): Promise<boolean> {
-    const resolvedOvenStorage =
-      ovenStorage ??
-      ((await (await this.tezos.wallet.at(this.ovenAddress)).storage()) as Record<string, unknown>);
-    return resolvedOvenStorage.isLiquidated as boolean;
+    const storage = await this.resolveStorage(ovenStorage);
+    return storage.isLiquidated as boolean;
   }
 
   public async getBalance(): Promise<Mutez> {

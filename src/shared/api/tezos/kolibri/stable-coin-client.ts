@@ -1,34 +1,29 @@
 import { Network } from "./types";
 import type { Address, Shard, Oven, InterestData } from "./types";
-import { TezosToolkit, UnitValue } from "@taquito/taquito";
-import type { WalletProvider } from "@taquito/taquito";
+import { UnitValue } from "@taquito/taquito";
+import type { TezosToolkit } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-import CONSTANTS from "./constants";
-import { compoundingLinearApproximation, interestRateToApy } from "./utils";
+import { compoundingLinearApproximation, getCompoundingPeriods, interestRateToApy } from "./utils";
 import type Decimal from "decimal.js";
 
 export default class StableCoinClient {
-  private readonly tezos: TezosToolkit;
   private minterStorageCache: Record<string, unknown> | null = null;
 
   public constructor(
-    nodeUrl: string,
+    private readonly tezos: TezosToolkit,
     private readonly network: Network,
     private readonly ovenRegistryAddress: Address,
     private readonly minterAddress: Address,
     private readonly ovenFactoryAddress: Address,
     private readonly indexerURL?: string,
-  ) {
-    this.tezos = new TezosToolkit(nodeUrl);
-  }
+  ) {}
 
   public getNetwork(): string {
     const networkString = this.network.toString();
     return networkString.charAt(0).toUpperCase() + networkString.slice(1);
   }
 
-  public async deployOven(wallet: WalletProvider): Promise<unknown> {
-    this.tezos.setWalletProvider(wallet);
+  public async deployOven(): Promise<unknown> {
     const ovenFactoryContract = await this.tezos.wallet.at(this.ovenFactoryAddress);
     return ovenFactoryContract.methodsObject.makeOven(UnitValue).send();
   }
@@ -68,9 +63,7 @@ export default class StableCoinClient {
     const raw = (await minterStorage.lastInterestIndexUpdateTime) as string;
     const lastUpdateTime = new Date(`${raw}`);
 
-    const deltaMs = time.getTime() - lastUpdateTime.getTime();
-    const deltaSecs = Math.floor(deltaMs / 1000);
-    const numPeriods = Math.floor(deltaSecs / CONSTANTS.COMPOUND_PERIOD_SECONDS);
+    const numPeriods = getCompoundingPeriods(lastUpdateTime, time);
 
     const simpleStabilityFee = minterStorage.stabilityFee as Shard;
 
@@ -115,15 +108,14 @@ export default class StableCoinClient {
         const valuesRes = await fetch(
           `${this.indexerURL}/v1/bigmap/sandboxnet/${ovenRegistryBigMapId}/keys?size=10&offset=${offset}`,
         );
-        const valuesData: Array<Record<string, Record<string, Record<string, unknown>>>> = await valuesRes.json();
-        valuesData.forEach(
-          (value) => {
-            results.push({
-              ovenAddress: value.data.key.value as string,
-              ovenOwner: value.data.value.value as string,
-            });
-          },
-        );
+        const valuesData: Array<Record<string, Record<string, Record<string, unknown>>>> =
+          await valuesRes.json();
+        valuesData.forEach((value) => {
+          results.push({
+            ovenAddress: value.data.key.value as string,
+            ovenOwner: value.data.value.value as string,
+          });
+        });
 
         if (valuesData.length < 10) {
           break;

@@ -1,37 +1,13 @@
-import type { Address } from "./types";
-import { TezosToolkit, TransactionWalletOperation } from "@taquito/taquito";
+import { TezosToolkit } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-import CONSTANTS from "./constants";
+import { SHARD, COMPOUNDS_PER_YEAR, COMPOUND_PERIOD_SECONDS } from "@/shared/config/constants";
 import Decimal from "decimal.js";
 
-export const deriveOvenAddress = async (
-  operation: TransactionWalletOperation,
-): Promise<Address> => {
-  const ovenCreationResults = await operation.operationResults();
-  if (!ovenCreationResults) throw new Error("No operation results found");
-
-  const results = ovenCreationResults as unknown as Array<Record<string, unknown>>;
-  const transactionResult = results.find((result) => result.kind === "transaction") as
-    | Record<string, unknown>
-    | undefined;
-
-  if (!transactionResult) throw new Error("No transaction result found in operation");
-
-  const metadata = transactionResult.metadata as Record<string, unknown>;
-  const internalOps = metadata.internal_operation_results as Array<Record<string, unknown>>;
-  const ovenResult = internalOps.find((op) => op.kind === "origination")!.result as Record<
-    string,
-    unknown
-  >;
-
-  return (ovenResult.originated_contracts as Array<string>)[0];
-};
-
 export const interestRateToApy = (interestRatePerPeriod: BigNumber): Decimal => {
-  const currentValueNoMantissa = new BigNumber(interestRatePerPeriod).dividedBy(
-    new BigNumber(10).pow(18),
+  const currentValueNoMantissa = new BigNumber(interestRatePerPeriod).dividedBy(SHARD);
+  const currentValueDecimal = new Decimal(currentValueNoMantissa.toFixed(18)).times(
+    COMPOUNDS_PER_YEAR,
   );
-  const currentValueDecimal = new Decimal(currentValueNoMantissa.toFixed(18)).times(60 * 24 * 365);
   const E = new Decimal(
     "2.7182818284590452353602874713526624977572470936999595749669676277240766303535475945713821785251664274",
   );
@@ -44,14 +20,18 @@ export const compoundingLinearApproximation = (
   interestRatePerPeriod: BigNumber,
   numPeriods: number,
 ): BigNumber => {
-  return initial
-    .times(CONSTANTS.PRECISION.plus(interestRatePerPeriod.times(numPeriods)))
-    .div(CONSTANTS.PRECISION);
+  return initial.times(SHARD.plus(interestRatePerPeriod.times(numPeriods))).div(SHARD);
+};
+
+export const getCompoundingPeriods = (since: Date, until: Date): number => {
+  const deltaMs = until.getTime() - since.getTime();
+  const deltaSecs = Math.floor(deltaMs / 1000);
+  return Math.floor(deltaSecs / COMPOUND_PERIOD_SECONDS);
 };
 
 export const getTokenBalance = async (
-  holder: Address,
-  tokenContractAddress: Address,
+  holder: string,
+  tokenContractAddress: string,
   tezos: TezosToolkit,
   tokenContractStorage?: Record<string, unknown>,
 ): Promise<BigNumber> => {

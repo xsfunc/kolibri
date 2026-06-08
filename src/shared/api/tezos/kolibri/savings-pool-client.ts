@@ -1,22 +1,31 @@
 import type { Address } from "./types";
 import { ContractAbstraction, ContractMethodObject, TezosToolkit, Wallet } from "@taquito/taquito";
-import type { WalletProvider } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-import { compoundingLinearApproximation, getTokenBalance, interestRateToApy } from "./utils";
-import CONSTANTS from "./constants";
+import {
+  compoundingLinearApproximation,
+  getCompoundingPeriods,
+  getTokenBalance,
+  interestRateToApy,
+} from "./utils";
+import { SHARD } from "@/shared/config/constants";
 import type Decimal from "decimal.js";
 
-export default class SavingsPoolClient {
-  private readonly tezos: TezosToolkit;
+const ZERO_MUTEZ = { amount: 0, mutez: true } as const;
 
+export default class SavingsPoolClient {
   public constructor(
-    nodeUrl: string,
-    wallet: WalletProvider,
+    private readonly tezos: TezosToolkit,
     public readonly savingsPoolAddress: string,
-  ) {
-    const tezos = new TezosToolkit(nodeUrl);
-    tezos.setWalletProvider(wallet);
-    this.tezos = tezos;
+  ) {}
+
+  private async resolveStorage(cache?: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return (
+      cache ??
+      ((await (await this.tezos.wallet.at(this.savingsPoolAddress)).storage()) as Record<
+        string,
+        unknown
+      >)
+    );
   }
 
   public async deposit(
@@ -24,8 +33,7 @@ export default class SavingsPoolClient {
     savingsPoolContract?: ContractAbstraction<Wallet>,
   ): Promise<unknown> {
     const depositTransaction = await this.makeDepositTransaction(kUSDAmount, savingsPoolContract);
-    const sendArgs = { amount: 0, mutez: true };
-    return await depositTransaction.send(sendArgs);
+    return await depositTransaction.send(ZERO_MUTEZ);
   }
 
   public async makeDepositTransaction(
@@ -45,8 +53,7 @@ export default class SavingsPoolClient {
       lpTokenAmount,
       savingsPoolContract,
     );
-    const sendArgs = { amount: 0, mutez: true };
-    return await makeRedeemTransaction.send(sendArgs);
+    return await makeRedeemTransaction.send(ZERO_MUTEZ);
   }
 
   public async makeRedeemTransaction(
@@ -59,13 +66,8 @@ export default class SavingsPoolClient {
   }
 
   public async getInterestRateAPY(savingsPoolStorage?: Record<string, unknown>): Promise<Decimal> {
-    const resolvedSavingsPoolStorage =
-      savingsPoolStorage ??
-      ((await (await this.tezos.wallet.at(this.savingsPoolAddress)).storage()) as Record<
-        string,
-        unknown
-      >);
-    const interestRate = resolvedSavingsPoolStorage.interestRate as BigNumber;
+    const storage = await this.resolveStorage(savingsPoolStorage);
+    const interestRate = storage.interestRate as BigNumber;
     return interestRateToApy(interestRate);
   }
 
@@ -73,33 +75,21 @@ export default class SavingsPoolClient {
     savingsPoolStorage?: Record<string, unknown>,
     time = new Date(),
   ): Promise<BigNumber> {
-    const resolvedSavingsPoolStorage =
-      savingsPoolStorage ??
-      ((await (await this.tezos.wallet.at(this.savingsPoolAddress)).storage()) as Record<
-        string,
-        unknown
-      >);
+    const storage = await this.resolveStorage(savingsPoolStorage);
 
-    const poolSize = resolvedSavingsPoolStorage.underlyingBalance as BigNumber;
-    const lastInterestUpdateTime = resolvedSavingsPoolStorage.lastInterestCompoundTime as string;
-    const interestRate = resolvedSavingsPoolStorage.interestRate as BigNumber;
+    const poolSize = storage.underlyingBalance as BigNumber;
+    const lastInterestUpdateTime = storage.lastInterestCompoundTime as string;
+    const interestRate = storage.interestRate as BigNumber;
 
     const lastUpdate = new Date(`${lastInterestUpdateTime}`);
-    const deltaMs = time.getTime() - lastUpdate.getTime();
-    const deltaSecs = Math.floor(deltaMs / 1000);
-    const numPeriods = Math.floor(deltaSecs / CONSTANTS.COMPOUND_PERIOD_SECONDS);
+    const numPeriods = getCompoundingPeriods(lastUpdate, time);
 
     return compoundingLinearApproximation(poolSize, interestRate, numPeriods);
   }
 
   public async getLPTokenTotal(savingsPoolStorage?: Record<string, unknown>): Promise<BigNumber> {
-    const resolvedSavingsPoolStorage =
-      savingsPoolStorage ??
-      ((await (await this.tezos.wallet.at(this.savingsPoolAddress)).storage()) as Record<
-        string,
-        unknown
-      >);
-    return resolvedSavingsPoolStorage.totalSupply as BigNumber;
+    const storage = await this.resolveStorage(savingsPoolStorage);
+    return storage.totalSupply as BigNumber;
   }
 
   public async getLPTokenConversionRate(
@@ -108,7 +98,7 @@ export default class SavingsPoolClient {
   ): Promise<BigNumber> {
     const poolSize = await this.getPoolSize(savingsPoolStorage, time);
     const totalLPTokens = await this.getLPTokenTotal(savingsPoolStorage);
-    return poolSize.times(CONSTANTS.PRECISION).times(CONSTANTS.PRECISION).dividedBy(totalLPTokens);
+    return poolSize.times(SHARD).times(SHARD).dividedBy(totalLPTokens);
   }
 
   public async getLPTokenBalance(
@@ -125,6 +115,6 @@ export default class SavingsPoolClient {
   ): Promise<BigNumber> {
     const conversionRate = await this.getLPTokenConversionRate(savingsPoolStorage);
     const lpTokenBalance = await this.getLPTokenBalance(address, tokenContractStorage);
-    return conversionRate.times(lpTokenBalance).dividedBy(CONSTANTS.PRECISION);
+    return conversionRate.times(lpTokenBalance).dividedBy(SHARD);
   }
 }

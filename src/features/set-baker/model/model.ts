@@ -1,4 +1,3 @@
-import type { BeaconWallet } from "@taquito/beacon-wallet";
 import { createEffect, sample, attach } from "effector";
 import { getOvenClient } from "@/shared/api/tezos/sdk";
 import { $wallet } from "@/entities/wallet/model/model";
@@ -11,26 +10,22 @@ interface SetBakerParams {
   baker: string | null;
 }
 
-interface SetBakerInternal extends SetBakerParams {
-  wallet: BeaconWallet;
-}
+// ─── Raw effect ──────────────────────────────────────────────────────────────
 
-// ─── Raw effect (accept wallet explicitly) ───────────────────────────────────
-
-const setBakerRawFx = createEffect(async ({ ovenAddress, baker, wallet }: SetBakerInternal) => {
-  const client = getOvenClient(wallet, ovenAddress);
+const setBakerRawFx = createEffect(async ({ ovenAddress, baker }: SetBakerParams) => {
+  const client = getOvenClient(ovenAddress);
   await client.setBaker(baker);
   return ovenAddress;
 });
 
-// ─── Attached effect (auto-inject wallet from store) ─────────────────────────
+// ─── Attached effect (guard: wallet must be connected) ───────────────────────
 
 export const setBakerFx = attach({
   source: $wallet,
   effect: setBakerRawFx,
   mapParams: (params: SetBakerParams, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ...params, wallet };
+    return params;
   },
 });
 

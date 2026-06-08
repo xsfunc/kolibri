@@ -1,6 +1,7 @@
 import { createEffect, sample, attach } from "effector";
 import { BeaconWallet } from "@taquito/beacon-wallet";
-import { BeaconEvent, NetworkType } from "@taquito/beacon-wallet";
+import { BeaconEvent } from "@taquito/beacon-wallet";
+import { NetworkType } from "@ecadlabs/beacon-types";
 import {
   walletConnected,
   walletConnecting,
@@ -8,12 +9,13 @@ import {
   walletErrored,
   $wallet,
 } from "@/entities/wallet/model/model";
+import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos/sdk";
 
 // ─── Effects ─────────────────────────────────────────────────────────────────
 
 export const connectWalletFx = createEffect(async () => {
   const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
-  wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
+  void wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
   await wallet.requestPermissions();
   const pkh = await wallet.getPKH();
   return { wallet, pkh };
@@ -25,7 +27,7 @@ export const disconnectWalletFx = createEffect(async (wallet: BeaconWallet) => {
 
 export const restoreSessionFx = createEffect(async () => {
   const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
-  wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
+  void wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
   const activeAccount = await wallet.client.getActiveAccount();
   if (!activeAccount) return null;
   const pkh = await wallet.getPKH();
@@ -52,6 +54,10 @@ sample({
 
 sample({
   clock: connectWalletFx.doneData,
+  fn: ({ wallet, pkh }) => {
+    setWalletProvider(wallet);
+    return { wallet, pkh };
+  },
   target: walletConnected,
 });
 
@@ -64,7 +70,20 @@ sample({
 sample({
   clock: restoreSessionFx.doneData,
   filter: (payload): payload is { wallet: BeaconWallet; pkh: string } => payload !== null,
+  fn: (payload) => {
+    const { wallet, pkh } = payload as { wallet: BeaconWallet; pkh: string };
+    setWalletProvider(wallet);
+    return { wallet, pkh };
+  },
   target: walletConnected,
+});
+
+sample({
+  clock: disconnectFx.done,
+  fn: () => {
+    clearWalletProvider();
+  },
+  target: [],
 });
 
 sample({

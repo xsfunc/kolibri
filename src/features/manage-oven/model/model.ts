@@ -1,5 +1,4 @@
 import { createEffect, createEvent, sample, attach } from "effector";
-import type { BeaconWallet } from "@taquito/beacon-wallet";
 import { getOvenClient } from "@/shared/api/tezos/sdk";
 import { $wallet } from "@/entities/wallet/model/model";
 import { refreshOvenFx } from "@/entities/oven/model/loadOvens";
@@ -12,49 +11,45 @@ interface OvenActionParams {
   amount: string;
 }
 
-interface OvenActionInternal extends OvenActionParams {
-  wallet: BeaconWallet;
-}
-
 // ─── Events ──────────────────────────────────────────────────────────────────
 
 export const txSubmitted = createEvent<string>();
 export const txConfirmed = createEvent<string>();
 
-// ─── Raw effects (accept wallet explicitly) ──────────────────────────────────
+// ─── Raw effects (verify wallet connected) ───────────────────────────────────
 
-const depositRawFx = createEffect(async ({ ovenAddress, amount, wallet }: OvenActionInternal) => {
-  const client = getOvenClient(wallet, ovenAddress);
+const depositRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
+  const client = getOvenClient(ovenAddress);
   await client.deposit(new BigNumber(amount));
   return ovenAddress;
 });
 
-const withdrawRawFx = createEffect(async ({ ovenAddress, amount, wallet }: OvenActionInternal) => {
-  const client = getOvenClient(wallet, ovenAddress);
+const withdrawRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
+  const client = getOvenClient(ovenAddress);
   await client.withdraw(new BigNumber(amount));
   return ovenAddress;
 });
 
-const borrowRawFx = createEffect(async ({ ovenAddress, amount, wallet }: OvenActionInternal) => {
-  const client = getOvenClient(wallet, ovenAddress);
+const borrowRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
+  const client = getOvenClient(ovenAddress);
   await client.borrow(new BigNumber(amount));
   return ovenAddress;
 });
 
-const repayRawFx = createEffect(async ({ ovenAddress, amount, wallet }: OvenActionInternal) => {
-  const client = getOvenClient(wallet, ovenAddress);
+const repayRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
+  const client = getOvenClient(ovenAddress);
   await client.repay(new BigNumber(amount));
   return ovenAddress;
 });
 
-// ─── Attached effects (auto-inject wallet from store) ────────────────────────
+// ─── Attached effects (guard: wallet must be connected) ──────────────────────
 
 export const depositFx = attach({
   source: $wallet,
   effect: depositRawFx,
   mapParams: (params: OvenActionParams, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ...params, wallet };
+    return params;
   },
 });
 
@@ -63,7 +58,7 @@ export const withdrawFx = attach({
   effect: withdrawRawFx,
   mapParams: (params: OvenActionParams, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ...params, wallet };
+    return params;
   },
 });
 
@@ -72,7 +67,7 @@ export const borrowFx = attach({
   effect: borrowRawFx,
   mapParams: (params: OvenActionParams, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ...params, wallet };
+    return params;
   },
 });
 
@@ -81,7 +76,7 @@ export const repayFx = attach({
   effect: repayRawFx,
   mapParams: (params: OvenActionParams, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ...params, wallet };
+    return params;
   },
 });
 

@@ -1,6 +1,6 @@
 import { createEffect, createStore, sample, attach } from "effector";
-import type { BeaconWallet } from "@taquito/beacon-wallet";
 import BigNumber from "bignumber.js";
+import { SHARD } from "@/shared/config/constants";
 import type { InterestData } from "@/shared/api/tezos/kolibri/types";
 import {
   ovensLoaded,
@@ -13,18 +13,13 @@ import {
   type OvenData,
   type PriceData,
 } from "./model";
-import { stableCoinClient, getOvenClient } from "@/shared/api/tezos/sdk";
-import { NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
+import { stableCoinClient, getOvenClient, NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
 import { $wallet } from "@/entities/wallet/model/model";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-async function fetchSingleOven(
-  wallet: BeaconWallet,
-  ovenAddress: string,
-  interestData: InterestData,
-): Promise<OvenData> {
-  const client = getOvenClient(wallet, ovenAddress);
+async function fetchSingleOven(ovenAddress: string, interestData: InterestData): Promise<OvenData> {
+  const client = getOvenClient(ovenAddress);
 
   const ovenStorage = await client.getOvenStorage();
 
@@ -48,48 +43,44 @@ async function fetchSingleOven(
   };
 }
 
-// ─── Raw effects (accept wallet explicitly) ──────────────────────────────────
+// ─── Raw effects ──────────────────────────────────────────────────────────────
 
-const loadOvensRawFx = createEffect(
-  async ({ pkh, wallet }: { pkh: string; wallet: BeaconWallet }) => {
-    const addresses: string[] = await stableCoinClient.ovensOwnedByAddress(pkh);
-    const total = addresses.length;
+const loadOvensRawFx = createEffect(async (pkh: string) => {
+  const addresses: string[] = await stableCoinClient.ovensOwnedByAddress(pkh);
+  const total = addresses.length;
 
-    ovenAddressesLoading(addresses);
-    ovenLoadProgress({ loaded: 0, total });
+  ovenAddressesLoading(addresses);
+  ovenLoadProgress({ loaded: 0, total });
 
-    const interestData = await stableCoinClient.getInterestData();
+  const interestData = await stableCoinClient.getInterestData();
 
-    const result: Record<string, OvenData> = {};
+  const result: Record<string, OvenData> = {};
 
-    for (let i = 0; i < addresses.length; i++) {
-      const data = await fetchSingleOven(wallet, addresses[i], interestData);
-      const oven = { ...data, ovenOwner: pkh };
-      result[addresses[i]] = oven;
-      ovenUpdated({ address: addresses[i], data: oven });
-      ovenLoadProgress({ loaded: i + 1, total });
-    }
+  for (let i = 0; i < addresses.length; i++) {
+    const data = await fetchSingleOven(addresses[i], interestData);
+    const oven = { ...data, ovenOwner: pkh };
+    result[addresses[i]] = oven;
+    ovenUpdated({ address: addresses[i], data: oven });
+    ovenLoadProgress({ loaded: i + 1, total });
+  }
 
-    return result;
-  },
-);
+  return result;
+});
 
-const refreshOvenRawFx = createEffect(
-  async ({ ovenAddress, wallet }: { ovenAddress: string; wallet: BeaconWallet }) => {
-    const interestData = await stableCoinClient.getInterestData();
-    const data = await fetchSingleOven(wallet, ovenAddress, interestData);
-    return { address: ovenAddress, data };
-  },
-);
+const refreshOvenRawFx = createEffect(async (ovenAddress: string) => {
+  const interestData = await stableCoinClient.getInterestData();
+  const data = await fetchSingleOven(ovenAddress, interestData);
+  return { address: ovenAddress, data };
+});
 
-// ─── Attached effects (auto-inject wallet from store) ────────────────────────
+// ─── Attached effects (guard: wallet must be connected) ──────────────────────
 
 export const loadOvensFx = attach({
   source: $wallet,
   effect: loadOvensRawFx,
   mapParams: (pkh: string, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { pkh, wallet };
+    return pkh;
   },
 });
 
@@ -98,11 +89,9 @@ export const refreshOvenFx = attach({
   effect: refreshOvenRawFx,
   mapParams: (ovenAddress: string, wallet) => {
     if (!wallet) throw new Error("Wallet not connected");
-    return { ovenAddress, wallet };
+    return ovenAddress;
   },
 });
-
-const SHARD_PRECISION = new BigNumber(10).pow(18);
 
 const TZKT_API = "https://api.tzkt.io/v1";
 
@@ -134,8 +123,8 @@ export const loadGlobalDataFx = createEffect(async () => {
   const rawCollateralRate = new BigNumber(minterStorage.collateralizationPercentage);
 
   const minterData = {
-    stabilityFee: rawStabilityFee.dividedBy(SHARD_PRECISION),
-    collateralRate: rawCollateralRate.dividedBy(SHARD_PRECISION),
+    stabilityFee: rawStabilityFee.dividedBy(SHARD),
+    collateralRate: rawCollateralRate.dividedBy(SHARD),
     collateralOperand: null,
     privateLiquidationThreshold: null,
   };
@@ -185,8 +174,5 @@ sample({
 
 sample({
   clock: loadGlobalDataFx.fail,
-  fn: ({ error }) => {
-    console.error("[loadGlobalData] failed:", error);
-  },
-  target: [],
+  target: ovensReset,
 });
