@@ -3,7 +3,7 @@ import { $isConnected } from "@/entities/wallet/model/model";
 import { ConnectButton } from "@/features/connect-wallet/ui/ConnectButton";
 import { WalletInfo } from "@/features/connect-wallet/ui/WalletInfo";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
-import { Button } from "@/shared/ui/Button";
+import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import { Settings } from "lucide-react";
 
@@ -42,9 +42,13 @@ export const Navbar = () => {
       </div>
       <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
         {isConnected ? <WalletInfo /> : <ConnectButton />}
-        <Button variant="icon" onClick={() => rpcSettingsOpened()} aria-label="RPC settings">
-          <Settings size={18} />
-        </Button>
+        <button
+          onClick={() => rpcSettingsOpened()}
+          aria-label="RPC settings"
+          className={button({ variant: "icon", size: "sm" })}
+        >
+          <Settings size={16} />
+        </button>
       </div>
     </header>
   );

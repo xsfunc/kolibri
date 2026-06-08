@@ -50,9 +50,9 @@ export const button = cva({
       },
     },
     size: {
-      sm: { px: "4", py: "2", fontSize: "14px" },
-      md: { px: "5", py: "2.5", fontSize: "16px" },
-      lg: { px: "6", py: "3", fontSize: "18px" },
+      sm: { px: "3", py: "1.5", fontSize: "13px" },
+      md: { px: "4", py: "2", fontSize: "14px" },
+      lg: { px: "5", py: "2.5", fontSize: "16px" },
     },
   },
   defaultVariants: {
@@ -60,9 +60,9 @@ export const button = cva({
     size: "md",
   },
   compoundVariants: [
-    { variant: "icon", size: "sm", css: { width: "28px", height: "28px" } },
-    { variant: "icon", size: "md", css: { width: "36px", height: "36px" } },
-    { variant: "icon", size: "lg", css: { width: "44px", height: "44px" } },
+    { variant: "icon", size: "sm", css: { width: "24px", height: "24px" } },
+    { variant: "icon", size: "md", css: { width: "32px", height: "32px" } },
+    { variant: "icon", size: "lg", css: { width: "40px", height: "40px" } },
   ],
 });
 

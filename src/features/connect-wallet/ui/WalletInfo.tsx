@@ -1,8 +1,8 @@
 import { useUnit } from "effector-react";
 import { $walletPKH, $isConnected } from "@/entities/wallet/model/model";
 import { disconnectFx } from "../model/model";
+import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
-import { Button } from "@/shared/ui/Button";
 import { truncateAddress } from "@/shared/lib/format";
 import { LogOut } from "lucide-react";
 
@@ -21,11 +21,11 @@ export const WalletInfo = () => {
       className={css({
         display: "flex",
         alignItems: "center",
-        gap: "token(spacing.sm)",
+        gap: "token(spacing.xs)",
         bg: "rgba(0, 255, 163, 0.08)",
         borderRadius: "token(radii.full)",
         px: "3",
-        py: "2",
+        py: "1",
       })}
     >
       <span
@@ -38,15 +38,14 @@ export const WalletInfo = () => {
       >
         {short}
       </span>
-      <Button
-        variant="icon"
-        size="sm"
+      <button
         onClick={() => disconnect()}
         disabled={pending || !isConnected}
         aria-label="Disconnect wallet"
+        className={button({ variant: "icon", size: "sm" })}
       >
         <LogOut size={14} />
-      </Button>
+      </button>
     </div>
   );
 };
