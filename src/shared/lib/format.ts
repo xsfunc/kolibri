@@ -25,3 +25,9 @@ export const formatNumber = (num: number | string, places = 2): string =>
     minimumFractionDigits: places,
     maximumFractionDigits: places,
   });
+
+export const formatUsd = (value: number | string): string => {
+  const num = Number(value);
+  if (!isFinite(num)) return "—";
+  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};

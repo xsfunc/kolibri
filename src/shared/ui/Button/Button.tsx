@@ -4,13 +4,21 @@ import type { ReactNode, ComponentPropsWithoutRef } from "react";
 
 interface ButtonProps {
   children: ReactNode;
-  variant?: "primary" | "ghost" | "danger" | "icon";
+  variant?:
+    | "primary"
+    | "ghost"
+    | "danger"
+    | "outlined"
+    | "outlined-warning"
+    | "outlined-danger"
+    | "icon";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   disabled?: boolean;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
   className?: string;
+  style?: React.CSSProperties;
   "aria-label"?: string;
 }
 
@@ -23,6 +31,7 @@ export const Button = ({
   onClick,
   type = "button",
   className,
+  style,
   "aria-label": ariaLabel,
 }: ButtonProps) => {
   const recipeClasses = button({ variant, size });
@@ -33,6 +42,7 @@ export const Button = ({
         <button
           {...props}
           className={`${recipeClasses} ${className ?? ""}`}
+          style={style}
           disabled={disabled || loading}
           aria-busy={loading}
           aria-label={ariaLabel}

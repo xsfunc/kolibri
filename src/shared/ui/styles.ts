@@ -40,6 +40,30 @@ export const button = cva({
         _hover: { opacity: "0.9" },
         _active: { transform: "scale(0.95)" },
       },
+      outlined: {
+        bg: "transparent",
+        border: "1px solid",
+        borderColor: "token(colors.primary-fixed-dim)",
+        color: "token(colors.primary-fixed-dim)",
+        _hover: { bg: "rgba(0, 226, 144, 0.05)" },
+        _active: { transform: "scale(0.95)" },
+      },
+      "outlined-warning": {
+        bg: "transparent",
+        border: "1px solid",
+        borderColor: "token(colors.tertiary-fixed-dim)",
+        color: "token(colors.tertiary-fixed-dim)",
+        _hover: { bg: "rgba(228, 196, 81, 0.05)" },
+        _active: { transform: "scale(0.95)" },
+      },
+      "outlined-danger": {
+        bg: "transparent",
+        border: "1px solid",
+        borderColor: "token(colors.error)",
+        color: "token(colors.error)",
+        _hover: { bg: "rgba(255, 180, 171, 0.05)" },
+        _active: { transform: "scale(0.95)" },
+      },
       icon: {
         bg: "transparent",
         border: "none",
@@ -75,7 +99,7 @@ export const card = cva({
     padding: "token(spacing.md)",
     display: "flex",
     flexDirection: "column",
-    gap: "token(spacing.sm)",
+    gap: "token(spacing.xs)",
   },
   variants: {
     interactive: {
