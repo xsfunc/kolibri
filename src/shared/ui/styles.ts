@@ -60,9 +60,9 @@ export const button = cva({
     size: "md",
   },
   compoundVariants: [
-    { variant: "icon", size: "sm", css: { width: "24px", height: "24px" } },
-    { variant: "icon", size: "md", css: { width: "32px", height: "32px" } },
-    { variant: "icon", size: "lg", css: { width: "40px", height: "40px" } },
+    { variant: "icon", size: "sm", css: { width: "28px", height: "28px", px: "0" } },
+    { variant: "icon", size: "md", css: { width: "36px", height: "36px", px: "0" } },
+    { variant: "icon", size: "lg", css: { width: "44px", height: "44px", px: "0" } },
   ],
 });
 
