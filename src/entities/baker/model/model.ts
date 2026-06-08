@@ -1,5 +1,4 @@
 import { createStore, createEvent, createEffect } from "effector";
-import axios from "axios";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -18,10 +17,11 @@ export const bakerSearchChanged = createEvent<string>();
 // ─── Effects ─────────────────────────────────────────────────────────────────
 
 export const loadBakersFx = createEffect(async () => {
-  const response = await axios.get<BakerInfo[]>(
+  const response = await fetch(
     "https://api.tzkt.io/v1/delegates?active=true&sort.desc=stakingBalance&limit=100",
   );
-  return response.data.map((b) => ({
+  const data: BakerInfo[] = await response.json();
+  return data.map((b) => ({
     address: b.address,
     alias: b.alias ?? null,
     stakingBalance: b.stakingBalance ?? 0,

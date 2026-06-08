@@ -3,7 +3,6 @@ import type { Address, Shard, Oven, InterestData } from "./types";
 import { TezosToolkit, UnitValue } from "@taquito/taquito";
 import type { WalletProvider } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-import axios, { type AxiosResponse } from "axios";
 import CONSTANTS from "./constants";
 import { compoundingLinearApproximation, interestRateToApy } from "./utils";
 import type Decimal from "decimal.js";
@@ -98,10 +97,11 @@ export default class StableCoinClient {
 
   async getAllOvens(): Promise<Array<Oven>> {
     if (this.indexerURL === undefined) {
-      const response = await axios.get(
+      const response = await fetch(
         `https://kolibri-data.s3.amazonaws.com/${this.network}/oven-key-data.json`,
       );
-      return response.data.ovenData;
+      const data = await response.json();
+      return data.ovenData;
     } else {
       const ovenRegistryContract = await this.tezos.contract.at(this.ovenRegistryAddress);
       const ovenRegistryStorage: Record<string, unknown> =
@@ -112,10 +112,11 @@ export default class StableCoinClient {
       const results: Oven[] = [];
 
       while (true) {
-        const values: AxiosResponse = await axios.get(
+        const valuesRes = await fetch(
           `${this.indexerURL}/v1/bigmap/sandboxnet/${ovenRegistryBigMapId}/keys?size=10&offset=${offset}`,
         );
-        (values.data as Array<Record<string, Record<string, Record<string, unknown>>>>).forEach(
+        const valuesData: Array<Record<string, Record<string, Record<string, unknown>>>> = await valuesRes.json();
+        valuesData.forEach(
           (value) => {
             results.push({
               ovenAddress: value.data.key.value as string,
@@ -124,7 +125,7 @@ export default class StableCoinClient {
           },
         );
 
-        if (values.data.length < 10) {
+        if (valuesData.length < 10) {
           break;
         }
 

@@ -1,6 +1,5 @@
 import { createEffect, createStore, sample, attach } from "effector";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
-import axios from "axios";
 import BigNumber from "bignumber.js";
 import type { InterestData } from "@/shared/api/tezos/kolibri/types";
 import {
@@ -118,18 +117,21 @@ interface MinterStorageResponse {
 
 /** Load global data (XTZ price, minter params) via TzKT API */
 export const loadGlobalDataFx = createEffect(async () => {
-  const [headData, minterStorage] = await Promise.all([
-    axios.get<TzktHeadResponse>(`${TZKT_API}/head`),
-    axios.get<MinterStorageResponse>(`${TZKT_API}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
+  const [headRes, minterRes] = await Promise.all([
+    fetch(`${TZKT_API}/head`),
+    fetch(`${TZKT_API}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
   ]);
+
+  const headData: TzktHeadResponse = await headRes.json();
+  const minterStorage: MinterStorageResponse = await minterRes.json();
 
   const priceData: PriceData = {
     timestamp: Math.floor(Date.now() / 1000),
-    price: new BigNumber(headData.data.quoteUsd),
+    price: new BigNumber(headData.quoteUsd),
   };
 
-  const rawStabilityFee = new BigNumber(minterStorage.data.stabilityFee);
-  const rawCollateralRate = new BigNumber(minterStorage.data.collateralizationPercentage);
+  const rawStabilityFee = new BigNumber(minterStorage.stabilityFee);
+  const rawCollateralRate = new BigNumber(minterStorage.collateralizationPercentage);
 
   const minterData = {
     stabilityFee: rawStabilityFee.dividedBy(SHARD_PRECISION),
