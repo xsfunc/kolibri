@@ -31,7 +31,7 @@ export const WalletInfo = () => {
       <span
         className={css({
           textStyle: "label-md",
-          fontFamily: "monospace",
+          fontFamily: "mono",
           color: "token(colors.primary-fixed-dim)",
         })}
         title={pkh ?? ""}

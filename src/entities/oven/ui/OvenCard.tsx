@@ -68,7 +68,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                 textStyle: "body-sm",
                 fontWeight: "700",
                 margin: "0",
-                fontFamily: "monospace",
+                fontFamily: "mono",
               })}
             >
               {truncateAddress(ovenAddress)}
@@ -241,7 +241,10 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
         >
           Baker{" "}
           <span
-            className={css({ color: "token(colors.primary-fixed-dim)", fontFamily: "monospace" })}
+            className={css({
+              color: "token(colors.primary-fixed-dim)",
+              fontFamily: "mono",
+            })}
           >
             {truncateAddress(oven.baker)}
           </span>

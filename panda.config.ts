@@ -67,6 +67,10 @@ export default defineConfig({
           sans: {
             value: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
           },
+          mono: {
+            value:
+              "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+          },
         },
         radii: {
           sm: { value: "4px" },
@@ -110,7 +114,7 @@ export default defineConfig({
       textStyles: {
         "display-lg": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "40px",
             fontWeight: "700",
             lineHeight: "48px",
@@ -119,7 +123,7 @@ export default defineConfig({
         },
         "headline-lg": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "32px",
             fontWeight: "600",
             lineHeight: "40px",
@@ -128,7 +132,7 @@ export default defineConfig({
         },
         "headline-md": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "24px",
             fontWeight: "600",
             lineHeight: "32px",
@@ -136,7 +140,7 @@ export default defineConfig({
         },
         "headline-sm": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "20px",
             fontWeight: "600",
             lineHeight: "28px",
@@ -144,7 +148,7 @@ export default defineConfig({
         },
         "body-lg": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "18px",
             fontWeight: "400",
             lineHeight: "28px",
@@ -152,7 +156,7 @@ export default defineConfig({
         },
         "body-md": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "16px",
             fontWeight: "400",
             lineHeight: "24px",
@@ -160,7 +164,7 @@ export default defineConfig({
         },
         "body-sm": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "14px",
             fontWeight: "400",
             lineHeight: "20px",
@@ -168,7 +172,7 @@ export default defineConfig({
         },
         "label-md": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "12px",
             fontWeight: "600",
             lineHeight: "16px",
@@ -177,7 +181,7 @@ export default defineConfig({
         },
         "label-sm": {
           value: {
-            fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            fontFamily: "sans",
             fontSize: "10px",
             fontWeight: "500",
             lineHeight: "14px",
@@ -189,6 +193,10 @@ export default defineConfig({
 
   outdir: "styled-system",
   globalCss: {
+    ":root": {
+      "--global-font-body": "var(--fonts-sans)",
+      "--global-font-mono": "var(--fonts-mono)",
+    },
     "@keyframes skeleton-pulse": {
       "0%, 100%": { opacity: "1" },
       "50%": { opacity: "0.4" },
