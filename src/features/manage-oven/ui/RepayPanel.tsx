@@ -9,9 +9,10 @@ import { css } from "../../../../styled-system/css";
 interface RepayPanelProps {
   ovenAddress: string;
   onClose: () => void;
+  disabled?: boolean;
 }
 
-export const RepayPanel = ({ ovenAddress, onClose }: RepayPanelProps) => {
+export const RepayPanel = ({ ovenAddress, onClose, disabled }: RepayPanelProps) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const { repay, pending } = useUnit({ repay: repayFx, pending: repayFx.pending });
@@ -50,8 +51,9 @@ export const RepayPanel = ({ ovenAddress, onClose }: RepayPanelProps) => {
         suffix="kUSD"
         error={error}
         id="repay-amount"
+        disabled={disabled}
       />
-      <Button type="submit" disabled={pending || !amount} loading={pending}>
+      <Button type="submit" disabled={disabled || pending || !amount} loading={pending}>
         Repay
       </Button>
     </form>

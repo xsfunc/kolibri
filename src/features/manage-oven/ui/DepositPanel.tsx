@@ -9,9 +9,10 @@ import { css } from "../../../../styled-system/css";
 interface DepositPanelProps {
   ovenAddress: string;
   onClose: () => void;
+  disabled?: boolean;
 }
 
-export const DepositPanel = ({ ovenAddress, onClose }: DepositPanelProps) => {
+export const DepositPanel = ({ ovenAddress, onClose, disabled }: DepositPanelProps) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const { deposit, pending } = useUnit({ deposit: depositFx, pending: depositFx.pending });
@@ -50,8 +51,9 @@ export const DepositPanel = ({ ovenAddress, onClose }: DepositPanelProps) => {
         suffix="XTZ"
         error={error}
         id="deposit-amount"
+        disabled={disabled}
       />
-      <Button type="submit" disabled={pending || !amount} loading={pending}>
+      <Button type="submit" disabled={disabled || pending || !amount} loading={pending}>
         Deposit
       </Button>
     </form>

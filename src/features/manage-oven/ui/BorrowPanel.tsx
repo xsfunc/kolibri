@@ -9,9 +9,10 @@ import { css } from "../../../../styled-system/css";
 interface BorrowPanelProps {
   ovenAddress: string;
   onClose: () => void;
+  disabled?: boolean;
 }
 
-export const BorrowPanel = ({ ovenAddress, onClose }: BorrowPanelProps) => {
+export const BorrowPanel = ({ ovenAddress, onClose, disabled }: BorrowPanelProps) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const { borrow, pending } = useUnit({ borrow: borrowFx, pending: borrowFx.pending });
@@ -50,8 +51,9 @@ export const BorrowPanel = ({ ovenAddress, onClose }: BorrowPanelProps) => {
         suffix="kUSD"
         error={error}
         id="borrow-amount"
+        disabled={disabled}
       />
-      <Button type="submit" disabled={pending || !amount} loading={pending}>
+      <Button type="submit" disabled={disabled || pending || !amount} loading={pending}>
         Borrow
       </Button>
     </form>

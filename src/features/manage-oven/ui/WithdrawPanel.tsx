@@ -9,9 +9,10 @@ import { css } from "../../../../styled-system/css";
 interface WithdrawPanelProps {
   ovenAddress: string;
   onClose: () => void;
+  disabled?: boolean;
 }
 
-export const WithdrawPanel = ({ ovenAddress, onClose }: WithdrawPanelProps) => {
+export const WithdrawPanel = ({ ovenAddress, onClose, disabled }: WithdrawPanelProps) => {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState("");
   const { withdraw, pending } = useUnit({ withdraw: withdrawFx, pending: withdrawFx.pending });
@@ -50,8 +51,9 @@ export const WithdrawPanel = ({ ovenAddress, onClose }: WithdrawPanelProps) => {
         suffix="XTZ"
         error={error}
         id="withdraw-amount"
+        disabled={disabled}
       />
-      <Button type="submit" disabled={pending || !amount} loading={pending}>
+      <Button type="submit" disabled={disabled || pending || !amount} loading={pending}>
         Withdraw
       </Button>
     </form>
