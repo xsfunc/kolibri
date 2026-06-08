@@ -1,5 +1,6 @@
 import { createEffect, sample, attach } from "effector";
 import { BeaconWallet } from "@taquito/beacon-wallet";
+import { BeaconEvent } from "@taquito/beacon-wallet";
 import { NetworkType } from "@ecadlabs/beacon-types";
 import {
   walletConnected,
@@ -13,6 +14,7 @@ import {
 
 export const connectWalletFx = createEffect(async () => {
   const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
+  wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
   await wallet.requestPermissions();
   const pkh = await wallet.getPKH();
   return { wallet, pkh };
@@ -24,6 +26,7 @@ export const disconnectWalletFx = createEffect(async (wallet: BeaconWallet) => {
 
 export const restoreSessionFx = createEffect(async () => {
   const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
+  wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
   const activeAccount = await wallet.client.getActiveAccount();
   if (!activeAccount) return null;
   const pkh = await wallet.getPKH();

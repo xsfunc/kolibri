@@ -24,7 +24,8 @@
     "effector": "^23.4.4",
     "effector-react": "^23.3.0",
     "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react-dom": "^19.2.6",
+    "vite-plugin-node-polyfills": "^0.28.0"
   },
   "devDependencies": {
     "@pandacss/dev": "^1.11.2",

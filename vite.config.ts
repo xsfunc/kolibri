@@ -1,6 +1,7 @@
 import { defineConfig } from "vite-plus";
 import { fileURLToPath, URL } from "node:url";
 import react from "@vitejs/plugin-react";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   resolve: {
@@ -131,5 +132,5 @@ export default defineConfig({
       "vite-plus/prefer-vite-plus-imports": "error",
     },
   },
-  plugins: [react()],
+  plugins: [react(), nodePolyfills({ include: ["buffer"] })],
 });
