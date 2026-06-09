@@ -115,5 +115,8 @@ npm run lint
 
 If KolibriXs is useful to you, consider supporting development with a donation:
 
-**Address:** `tz1UVGqvZd7LxLtA2ZDTMz74fXJWqxRjqJS4` (XTZ, USDt, kUSD)
-**Contact:** [Telegram @xsfunc](https://t.me/xsfunc)
+**TZ Address:** `tz1UVGqvZd7LxLtA2ZDTMz74fXJWqxRjqJS4` (XTZ, USDt, kUSD, NFT)
+
+**EVM Address:** `0xd50eF0e3b8D6d920a6c898aA139D038e014bA4A9`
+
+**Contact:** Telegram [@xsfunc](https://t.me/xsfunc)
