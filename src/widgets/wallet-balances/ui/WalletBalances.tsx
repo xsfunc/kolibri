@@ -5,20 +5,31 @@ import {
   $isConnected,
   loadWalletBalancesFx,
 } from "@/entities/wallet";
+import { $priceData, $kusdPriceData } from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
-import { formatToken } from "@/shared/lib/format";
+import { formatToken, formatUsd } from "@/shared/lib/format";
 import { css, cx } from "styled-system/css";
 import { Wallet } from "lucide-react";
 
 export const WalletBalances = () => {
-  const { kUSD, xtz, isConnected, loading } = useUnit({
+  const { kUSD, xtz, isConnected, loading, priceData, kusdPriceData } = useUnit({
     kUSD: $walletBalance,
     xtz: $walletBalanceXTZ,
     isConnected: $isConnected,
     loading: loadWalletBalancesFx.pending,
+    priceData: $priceData,
+    kusdPriceData: $kusdPriceData,
   });
 
   const isLoading = !isConnected || loading || kUSD == null;
+
+  const xtzUsd =
+    xtz != null && priceData != null && !xtz.isZero() ? xtz.multipliedBy(priceData.price) : null;
+
+  const kusdUsd =
+    kUSD != null && kusdPriceData != null && !kUSD.isZero()
+      ? kUSD.multipliedBy(kusdPriceData.price)
+      : null;
 
   return (
     <div className={card()}>
@@ -76,7 +87,7 @@ export const WalletBalances = () => {
               marginBottom: "token(spacing.xs)",
             })}
           >
-            kUSD
+            kUSD{kusdUsd != null ? ` (${formatUsd(kusdUsd.toNumber())})` : ""}
           </span>
           {isLoading ? (
             <div
@@ -119,7 +130,7 @@ export const WalletBalances = () => {
               marginBottom: "token(spacing.xs)",
             })}
           >
-            XTZ
+            XTZ{xtzUsd != null ? ` (${formatUsd(xtzUsd.toNumber())})` : ""}
           </span>
           {isLoading ? (
             <div
