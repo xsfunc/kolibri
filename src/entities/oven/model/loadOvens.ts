@@ -1,7 +1,7 @@
-import { createEffect, createStore, sample, attach } from "effector";
+import { createEffect, createStore, sample, attach, combine } from "effector";
 import { BigNumber } from "@/shared/lib/bignumber";
 import { SHARD } from "@/shared/config/constants";
-import type { InterestData } from "@/shared/api/tezos/kolibri";
+import type { InterestData, KusdPriceData } from "@/shared/api/tezos/kolibri";
 import {
   ovensLoaded,
   ovenUpdated,
@@ -10,10 +10,17 @@ import {
   ovensReset,
   priceDataLoaded,
   minterDataLoaded,
+  kusdPriceDataLoaded,
+  $priceData,
   type OvenData,
   type PriceData,
 } from "./model";
-import { stableCoinClient, getOvenClient, NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
+import {
+  stableCoinClient,
+  getOvenClient,
+  kusdPriceClient,
+  NETWORK_CONTRACTS,
+} from "@/shared/api/tezos/sdk";
 import { $wallet } from "@/entities/wallet/@x/oven";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -176,3 +183,40 @@ sample({
   clock: loadGlobalDataFx.fail,
   target: ovensReset,
 });
+
+// ─── kUSD price loading (TzKT primary, on-chain fallback) ──────────────────────
+
+const loadKusdPriceFromTzktRawFx = createEffect(
+  (xtzUsdPrice: BigNumber): Promise<KusdPriceData> =>
+    kusdPriceClient.getkUSDPriceFromTzKT(xtzUsdPrice),
+);
+
+const loadKusdPriceFromContractRawFx = createEffect(
+  (xtzUsdPrice: BigNumber): Promise<KusdPriceData> =>
+    kusdPriceClient.getkUSDPriceFromContract(xtzUsdPrice),
+);
+
+sample({
+  clock: priceDataLoaded,
+  fn: (data) => data.price,
+  target: loadKusdPriceFromTzktRawFx,
+});
+
+sample({
+  clock: loadKusdPriceFromTzktRawFx.fail,
+  source: { priceData: $priceData },
+  filter: ({ priceData }) => priceData !== null,
+  fn: ({ priceData }) => priceData!.price,
+  target: loadKusdPriceFromContractRawFx,
+});
+
+sample({
+  clock: [loadKusdPriceFromTzktRawFx.doneData, loadKusdPriceFromContractRawFx.doneData],
+  target: kusdPriceDataLoaded,
+});
+
+export const $kusdPricePending = combine(
+  loadKusdPriceFromTzktRawFx.pending,
+  loadKusdPriceFromContractRawFx.pending,
+  (a, b) => a || b,
+);

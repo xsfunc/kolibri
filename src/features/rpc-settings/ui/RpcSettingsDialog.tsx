@@ -11,7 +11,7 @@ import { css } from "styled-system/css";
 const PRESETS = [
   { label: "tzkt", value: "https://rpc.tzkt.io/mainnet" },
   { label: "SmartPy", value: "https://mainnet.smartpy.io" },
-  { label: "Trilitech", value: "https://tezos-mainnet.octez.io" }
+  { label: "Trilitech", value: "https://tezos-mainnet.octez.io" },
 ] as const;
 
 const CUSTOM_VALUE = "__custom__";

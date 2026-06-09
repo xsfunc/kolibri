@@ -3,6 +3,7 @@ export {
   $ownedOvens,
   $priceData,
   $minterData,
+  $kusdPriceData,
   $ovenList,
   $ovensLoading,
   $ovensAllLoaded,
@@ -11,15 +12,24 @@ export {
   $ovenHealthMap,
   priceDataLoaded,
   minterDataLoaded,
+  kusdPriceDataLoaded,
   ovensReset,
 } from "./model/model";
-export type { OvenData, PriceData, MinterData, OvenHealth, HealthLevel } from "./model/model";
+export type {
+  OvenData,
+  PriceData,
+  MinterData,
+  KusdPriceData,
+  OvenHealth,
+  HealthLevel,
+} from "./model/model";
 export {
   loadOvensFx,
   refreshOvenFx,
   loadGlobalDataFx,
   $ovensLoadPending,
   $globalDataPending,
+  $kusdPricePending,
   $refreshingOvenAddress,
 } from "./model/loadOvens";
 export { $ovenCalculations } from "./model/calculations";

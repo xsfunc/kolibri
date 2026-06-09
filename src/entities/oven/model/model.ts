@@ -1,5 +1,7 @@
 import { createStore, createEvent, combine } from "effector";
 import type { BigNumber } from "@/shared/lib/bignumber";
+import type { KusdPriceData } from "@/shared/api/tezos/kolibri";
+export type { KusdPriceData } from "@/shared/api/tezos/kolibri";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -40,6 +42,9 @@ export const priceDataLoaded = createEvent<PriceData>();
 /** Minter data loaded */
 export const minterDataLoaded = createEvent<MinterData>();
 
+/** kUSD price data loaded */
+export const kusdPriceDataLoaded = createEvent<KusdPriceData>();
+
 /** User disconnected — reset ovens */
 export const ovensReset = createEvent();
 
@@ -68,6 +73,11 @@ export const $minterData = createStore<MinterData>({
   collateralOperand: null,
   privateLiquidationThreshold: null,
 }).on(minterDataLoaded, (_, data) => data);
+
+export const $kusdPriceData = createStore<KusdPriceData | null>(null).on(
+  kusdPriceDataLoaded,
+  (_, data) => data,
+);
 
 export const $ovensLoadProgress = createStore<{ loaded: number; total: number } | null>(null)
   .on(ovenLoadProgress, (_, p) => p)
