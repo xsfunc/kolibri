@@ -11,7 +11,7 @@ import {
   $withdrawProjectedUtil,
 } from "../model/model";
 import { UtilizationPreview } from "./UtilizationPreview";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 export const WithdrawPanel = () => {
   const amount = useUnit($withdrawAmount);

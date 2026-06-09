@@ -1,7 +1,7 @@
 import { useUnit } from "effector-react";
 import { $priceData, $minterData, $globalDataPending } from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
-import { css, cx } from "../../../../styled-system/css";
+import { css, cx } from "styled-system/css";
 import { TrendingUp, Shield, Percent } from "lucide-react";
 
 const statCards = [

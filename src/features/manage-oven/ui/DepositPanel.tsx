@@ -11,7 +11,7 @@ import {
   $depositProjectedUtil,
 } from "../model/model";
 import { UtilizationPreview } from "./UtilizationPreview";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 export const DepositPanel = () => {
   const amount = useUnit($depositAmount);

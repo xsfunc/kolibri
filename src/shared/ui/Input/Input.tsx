@@ -1,7 +1,7 @@
 import { Field } from "@base-ui/react/field";
 import { Input as BaseInput } from "@base-ui/react/input";
 import { input } from "@/shared/ui/styles";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import type { InputHTMLAttributes } from "react";
 
 interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {

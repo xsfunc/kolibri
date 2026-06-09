@@ -3,7 +3,7 @@ import { $ownedOvens, $ovenHealthMap, type HealthLevel } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
 import { $ovenCalculations } from "../model/calculations";
 import { card, skeleton } from "@/shared/ui/styles";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
 import { truncateAddress, numberWithCommas, formatUsd } from "@/shared/lib/format";

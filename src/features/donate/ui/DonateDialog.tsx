@@ -14,7 +14,7 @@ import { connectWalletFx } from "@/features/connect-wallet";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";
 import { Copy } from "lucide-react";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 type TxStatus = "idle" | "pending" | "success" | "error";
 

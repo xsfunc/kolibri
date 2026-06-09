@@ -14,7 +14,7 @@ import {
   $dialogOpen,
 } from "../model/model";
 import { getUtilLevel, levelStyles } from "@/shared/lib/utilization-levels";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 const TAB_ITEMS: { value: Tab; label: string }[] = [
   { value: "deposit", label: "Deposit" },

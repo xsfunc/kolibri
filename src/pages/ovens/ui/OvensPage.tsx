@@ -4,7 +4,7 @@ import { WalletBalances } from "@/widgets/wallet-balances";
 import { OvenList } from "@/widgets/oven-list";
 import { ConnectPrompt } from "@/features/connect-wallet";
 import { $isConnected } from "@/entities/wallet";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 export const OvensPage = () => {
   const isConnected = useUnit($isConnected);

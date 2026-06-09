@@ -1,4 +1,4 @@
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import { levelStyles, getUtilLevel } from "@/shared/lib/utilization-levels";
 
 interface UtilizationPreviewProps {

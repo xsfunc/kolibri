@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { input } from "@/shared/ui/styles";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 interface AutocompleteOption {
   value: string;

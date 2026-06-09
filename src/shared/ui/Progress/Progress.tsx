@@ -1,6 +1,6 @@
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import { progressTrack } from "@/shared/ui/styles";
-import { css, cva } from "../../../../styled-system/css";
+import { css, cva } from "styled-system/css";
 
 interface ProgressProps {
   value: number;

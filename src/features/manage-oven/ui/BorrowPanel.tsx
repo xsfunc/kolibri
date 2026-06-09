@@ -11,7 +11,7 @@ import {
   $borrowProjectedUtil,
 } from "../model/model";
 import { UtilizationPreview } from "./UtilizationPreview";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 export const BorrowPanel = () => {
   const amount = useUnit($borrowAmount);

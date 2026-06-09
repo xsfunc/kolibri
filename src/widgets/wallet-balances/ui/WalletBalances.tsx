@@ -6,7 +6,7 @@ import {
   loadWalletBalancesFx,
 } from "@/entities/wallet";
 import { card, skeleton } from "@/shared/ui/styles";
-import { css, cx } from "../../../../styled-system/css";
+import { css, cx } from "styled-system/css";
 import { Wallet } from "lucide-react";
 
 export const WalletBalances = () => {

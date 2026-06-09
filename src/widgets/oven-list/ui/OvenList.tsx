@@ -12,7 +12,7 @@ import {
 import { $walletPKH } from "@/entities/wallet";
 import { Button } from "@/shared/ui/Button";
 import { Progress } from "@/shared/ui/Progress";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
 import { dialogOpened, $dialogOpen, type Tab } from "@/features/manage-oven";

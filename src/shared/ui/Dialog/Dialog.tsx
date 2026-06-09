@@ -1,6 +1,6 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { dialogBackdrop, dialogPopup, button } from "@/shared/ui/styles";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import type { ReactNode } from "react";
 
 interface DialogProps {

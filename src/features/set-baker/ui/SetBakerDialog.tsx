@@ -5,7 +5,7 @@ import { $bakers, $bakersLoading, loadBakersFx } from "@/entities/baker";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Autocomplete } from "@/shared/ui/Autocomplete";
 import { Button } from "@/shared/ui/Button";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 interface SetBakerDialogProps {
   ovenAddress: string;

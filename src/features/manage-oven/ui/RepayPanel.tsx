@@ -11,7 +11,7 @@ import {
   $repayProjectedUtil,
 } from "../model/model";
 import { UtilizationPreview } from "./UtilizationPreview";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 export const RepayPanel = () => {
   const amount = useUnit($repayAmount);

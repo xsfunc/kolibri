@@ -1,7 +1,7 @@
 import { useUnit } from "effector-react";
 import { connectWalletFx } from "../model/model";
 import { card } from "@/shared/ui/styles";
-import { css, cx } from "../../../../styled-system/css";
+import { css, cx } from "styled-system/css";
 import { Wallet } from "lucide-react";
 import { Button } from "@/shared/ui/Button";
 

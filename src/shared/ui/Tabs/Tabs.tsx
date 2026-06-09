@@ -1,5 +1,5 @@
 import { Tabs as BaseTabs } from "@base-ui/react/tabs";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 import type { ReactNode } from "react";
 
 interface TabItem {

@@ -6,7 +6,7 @@ import { $rpcSettingsOpen, rpcSettingsClosed } from "../model/model";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
-import { css } from "../../../../styled-system/css";
+import { css } from "styled-system/css";
 
 const PRESETS = [
   { label: "tzkt (Default)", value: "https://rpc.tzkt.io/mainnet" },
