@@ -75,7 +75,7 @@ export const WalletBalances = () => {
           className={css({
             bg: "token(colors.surface-container-low)",
             padding: "token(spacing.sm)",
-            borderRadius: "token(radii.DEFAULT)",
+            borderRadius: "token(radii.sm)",
             border: "1px solid rgba(255, 255, 255, 0.05)",
           })}
         >
@@ -118,7 +118,7 @@ export const WalletBalances = () => {
           className={css({
             bg: "token(colors.surface-container-low)",
             padding: "token(spacing.sm)",
-            borderRadius: "token(radii.DEFAULT)",
+            borderRadius: "token(radii.sm)",
             border: "1px solid rgba(255, 255, 255, 0.05)",
           })}
         >
