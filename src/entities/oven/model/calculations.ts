@@ -33,7 +33,7 @@ function computeOvenCalculations(
 
   const liquidationPrice =
     !debtKusd.isZero() && !collateralXtz.isZero() && collateralRate
-      ? debtKusd.multipliedBy(collateralRate).dividedBy(collateralXtz)
+      ? debtKusd.multipliedBy(collateralRate).dividedBy(collateralXtz.multipliedBy(100))
       : null;
 
   return { collateralXtz, debtKusd, collateralValueUsd, maxDebt, utilizationPct, liquidationPrice };

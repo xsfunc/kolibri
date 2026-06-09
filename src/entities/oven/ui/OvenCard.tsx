@@ -7,6 +7,7 @@ import { css, cx } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
 import { truncateAddress, formatToken, formatUsd, formatPercent } from "@/shared/lib/format";
+import { BLOCK_EXPLORER_URL } from "@/shared/config/links";
 import {
   levelStyles,
   getUtilLevel,
@@ -54,7 +55,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               })}
             >
               <a
-                href={`https://tzkt.io/${ovenAddress}`}
+                href={`${BLOCK_EXPLORER_URL}/${ovenAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={css({
@@ -247,7 +248,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
             <span
               className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
             >
-              Loan Amt
+              Loan Amount
             </span>
             <span
               className={cx(
@@ -303,7 +304,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
             })}
           >
             <a
-              href={`https://tzkt.io/${ovenAddress}`}
+              href={`${BLOCK_EXPLORER_URL}/${ovenAddress}`}
               target="_blank"
               rel="noopener noreferrer"
               className={css({
@@ -337,13 +338,19 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           })}
         >
           Baker{" "}
-          <span
+          <a
+            href={`${BLOCK_EXPLORER_URL}/${oven.baker}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className={css({
               color: "token(colors.primary-fixed-dim)",
+              textDecoration: "none",
+              textUnderlineOffset: "2px",
+              _hover: { textDecoration: "underline" },
             })}
           >
             {truncateAddress(oven.baker)}
-          </span>
+          </a>
         </p>
       )}
 
@@ -365,7 +372,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           <span
             className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
           >
-            Collateral Utilization
+            Collateral utilization
           </span>
           <span
             className={css({
@@ -412,7 +419,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
             })}
           >
             {liquidationPrice != null ? (
-              formatUsd(liquidationPrice.toNumber())
+              formatUsd(liquidationPrice.toNumber(), 4)
             ) : calc != null ? (
               "—"
             ) : (
@@ -468,7 +475,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           <span
             className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
           >
-            Collateral Value
+            Collateral value
           </span>
           <span
             className={css({
@@ -529,7 +536,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           <span
             className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
           >
-            Loan Amt
+            Loan amount
           </span>
           <span
             className={css({
@@ -733,7 +740,7 @@ export const SkeletonOvenCard = () => (
         })}
       >
         <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
-          Loan Amt
+          Loan Amount
         </span>
         <span
           className={cx(
