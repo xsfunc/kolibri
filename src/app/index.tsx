@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import { Providers } from "./providers";
 import { Navbar } from "@/widgets/navbar";
+import { Footer } from "@/widgets/footer";
 import { OvensPage } from "@/pages/ovens";
 import { appStarted } from "./model/init";
 import "./styles/global.css";
@@ -26,6 +27,7 @@ export const App = () => {
     <Providers>
       <Navbar />
       <OvensPage />
+      <Footer />
       <Suspense>
         <RpcSettingsDialog />
         <DonateDialog />

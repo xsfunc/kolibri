@@ -3,6 +3,7 @@ import { $walletState } from "@/entities/wallet";
 import { ConnectButton, WalletInfo } from "@/features/connect-wallet";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { donateOpened } from "@/features/donate";
+import { REPO_URL, TWITTER_URL } from "@/shared/config/links";
 import { button } from "@/shared/ui/styles";
 import { css } from "styled-system/css";
 import { CodeXml, Settings, Heart } from "lucide-react";
@@ -56,7 +57,7 @@ export const Navbar = () => {
         >
           Dashboard by{" "}
           <a
-            href="https://x.com/xsfunc"
+            href={TWITTER_URL}
             target="_blank"
             rel="noopener noreferrer"
             className={css({
@@ -72,7 +73,7 @@ export const Navbar = () => {
       </div>
       <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
         <a
-          href="https://github.com/xsfunc/kolibri"
+          href={REPO_URL}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="GitHub repository"
