@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
+  base: process.env.VITE_BASE || "/",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -22,6 +23,12 @@ export default defineConfig({
     },
     ignorePatterns: ["dist", ".agents", "styled-system"],
     overrides: [
+      {
+        files: ["vite.config.ts"],
+        env: {
+          node: true,
+        },
+      },
       {
         files: ["**/*.{ts,tsx}"],
         rules: {

@@ -6,7 +6,8 @@
     "dev": "vp dev",
     "build": "tsc -b && vp build",
     "lint": "vp lint .",
-    "preview": "vp preview"
+    "preview": "vp preview",
+    "prepare": "panda codegen"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
