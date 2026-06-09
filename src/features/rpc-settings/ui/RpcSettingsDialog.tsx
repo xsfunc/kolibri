@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { useUnit } from "effector-react";
-import { $rpcNode } from "@/shared/api/tezos/rpc";
-import { rpcNodeChanged } from "../model/rpc";
+import { $rpcNode, rpcNodeChanged } from "@/entities/rpc";
 import { $rpcSettingsOpen, rpcSettingsClosed } from "../model/model";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
+import { RadioGroup, RadioCard } from "@/shared/ui/Radio";
 import { css } from "styled-system/css";
 
 const PRESETS = [
-  { label: "tzkt (Default)", value: "https://rpc.tzkt.io/mainnet" },
+  { label: "tzkt", value: "https://rpc.tzkt.io/mainnet" },
   { label: "SmartPy", value: "https://mainnet.smartpy.io" },
-  { label: "Tezarago", value: "https://mainnet.tezarago.com" },
+  { label: "Trilitech", value: "https://tezos-mainnet.octez.io" }
 ] as const;
 
 const CUSTOM_VALUE = "__custom__";
@@ -23,7 +23,7 @@ export const RpcSettingsDialog = () => {
     close: rpcSettingsClosed,
   });
 
-  const [selected, setSelected] = useState(CUSTOM_VALUE);
+  const [selected, setSelected] = useState<string>(CUSTOM_VALUE);
   const [customUrl, setCustomUrl] = useState("");
 
   useEffect(() => {
@@ -49,75 +49,85 @@ export const RpcSettingsDialog = () => {
       onClose={close}
       title="RPC Node"
       description="Select a preset or enter a custom Tezos RPC endpoint."
+      titleTextStyle="body-lg"
+      descTextStyle="label-md"
     >
-      <div className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.md)" })}>
+      <RadioGroup
+        value={selected}
+        onValueChange={setSelected}
+        name="rpc-preset"
+        className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.sm)" })}
+      >
         {PRESETS.map((preset) => (
-          <label
-            key={preset.value}
+          <RadioCard key={preset.value} value={preset.value}>
+            <div
+              className={css({
+                display: "flex",
+                flexDirection: "column",
+                minWidth: "0",
+                flex: "1",
+              })}
+            >
+              <span
+                className={css({
+                  textStyle: "body-sm",
+                  color: "token(colors.on-surface)",
+                })}
+              >
+                {preset.label}
+              </span>
+              <span
+                className={css({
+                  textStyle: "label-md",
+                  color: "token(colors.on-surface-variant)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                })}
+              >
+                {preset.value}
+              </span>
+            </div>
+          </RadioCard>
+        ))}
+
+        <RadioCard value={CUSTOM_VALUE}>
+          <div
             className={css({
               display: "flex",
-              alignItems: "center",
-              gap: "token(spacing.sm)",
-              cursor: "pointer",
-              textStyle: "body-md",
-              color: "token(colors.on-surface)",
+              flexDirection: "column",
+              minWidth: "0",
+              flex: "1",
+              gap: "token(spacing.xs)",
             })}
           >
-            <input
-              type="radio"
-              name="rpc-preset"
-              value={preset.value}
-              checked={selected === preset.value}
-              onChange={() => setSelected(preset.value)}
-            />
-            <span>{preset.label}</span>
             <span
               className={css({
                 textStyle: "body-sm",
-                color: "token(colors.on-surface-variant)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                color: "token(colors.on-surface)",
               })}
             >
-              {preset.value}
+              Custom
             </span>
-          </label>
-        ))}
+            {selected === CUSTOM_VALUE && (
+              <Input
+                label="Custom RPC URL"
+                placeholder="https://..."
+                value={customUrl}
+                onChange={(e) => setCustomUrl(e.target.value)}
+              />
+            )}
+          </div>
+        </RadioCard>
+      </RadioGroup>
 
-        <label
-          className={css({
-            display: "flex",
-            alignItems: "center",
-            gap: "token(spacing.sm)",
-            cursor: "pointer",
-            textStyle: "body-md",
-            color: "token(colors.on-surface)",
-          })}
-        >
-          <input
-            type="radio"
-            name="rpc-preset"
-            value={CUSTOM_VALUE}
-            checked={selected === CUSTOM_VALUE}
-            onChange={() => setSelected(CUSTOM_VALUE)}
-          />
-          <span>Custom</span>
-        </label>
-
-        {selected === CUSTOM_VALUE && (
-          <Input
-            label="Custom RPC URL"
-            placeholder="https://..."
-            value={customUrl}
-            onChange={(e) => setCustomUrl(e.target.value)}
-          />
-        )}
-
-        <Button onClick={handleApply} disabled={!effectiveUrl}>
-          Apply
-        </Button>
-      </div>
+      <Button
+        onClick={handleApply}
+        disabled={!effectiveUrl}
+        className={css({ marginTop: "token(spacing.md)" })}
+      >
+        Apply
+      </Button>
     </Dialog>
   );
 };
