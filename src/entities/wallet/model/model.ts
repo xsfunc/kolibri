@@ -4,7 +4,7 @@ import type { BigNumber } from "@/shared/lib/bignumber";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type WalletState = "DISCONNECTED" | "CONNECTING" | "CONNECTED" | "ERROR";
+export type WalletState = "INITIALIZING" | "DISCONNECTED" | "CONNECTING" | "CONNECTED" | "ERROR";
 
 export interface WalletConnectedPayload {
   wallet: BeaconWallet;
@@ -33,13 +33,17 @@ export const walletErrored = createEvent<string>();
 /** Balances updated */
 export const balancesUpdated = createEvent<WalletBalances>();
 
+/** Session check finished with no active wallet */
+export const sessionCheckDone = createEvent();
+
 // ─── Stores ──────────────────────────────────────────────────────────────────
 
-export const $walletState = createStore<WalletState>("DISCONNECTED")
+export const $walletState = createStore<WalletState>("INITIALIZING")
   .on(walletConnecting, () => "CONNECTING")
   .on(walletConnected, () => "CONNECTED")
   .on(walletDisconnected, () => "DISCONNECTED")
-  .on(walletErrored, () => "ERROR");
+  .on(walletErrored, () => "ERROR")
+  .on(sessionCheckDone, () => "DISCONNECTED");
 
 export const $walletPKH = createStore<string | null>(null)
   .on(walletConnected, (_, { pkh }) => pkh)
@@ -61,3 +65,6 @@ export const $walletBalanceXTZ = createStore<BigNumber | null>(null)
 
 /** true if wallet is connected and pkh is known */
 export const $isConnected = $walletState.map((s) => s === "CONNECTED");
+
+/** true while session restore is in progress */
+export const $isInitializing = $walletState.map((s) => s === "INITIALIZING");

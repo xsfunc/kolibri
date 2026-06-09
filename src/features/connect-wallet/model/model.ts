@@ -1,11 +1,13 @@
-import { createEffect, sample, attach } from "effector";
+import { createEffect, sample, attach, createEvent } from "effector";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
 import {
   walletConnected,
   walletConnecting,
   walletDisconnected,
   walletErrored,
+  sessionCheckDone,
   $wallet,
+  $walletState,
 } from "@/entities/wallet";
 import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos/sdk";
 
@@ -52,6 +54,8 @@ export const disconnectFx = attach({
 
 sample({
   clock: connectWalletFx,
+  source: $walletState,
+  filter: (state) => state !== "INITIALIZING",
   target: walletConnecting,
 });
 
@@ -82,6 +86,17 @@ sample({
 });
 
 sample({
+  clock: restoreSessionFx.doneData,
+  filter: (payload) => payload === null,
+  target: sessionCheckDone,
+});
+
+sample({
+  clock: restoreSessionFx.failData,
+  target: sessionCheckDone,
+});
+
+sample({
   clock: disconnectFx.done,
   fn: () => {
     clearWalletProvider();
@@ -92,4 +107,23 @@ sample({
 sample({
   clock: disconnectFx.done,
   target: walletDisconnected,
+});
+
+// ─── Timeout: fallback if restoreSessionFx hangs ────────────────────────────
+
+const sessionTimeoutTick = createEvent();
+
+sample({
+  clock: restoreSessionFx,
+  target: createEffect(() => {
+    const timer = setTimeout(() => sessionTimeoutTick(), 5000);
+    return () => clearTimeout(timer);
+  }),
+});
+
+sample({
+  clock: sessionTimeoutTick,
+  source: $walletState,
+  filter: (state: string) => state === "INITIALIZING",
+  target: sessionCheckDone,
 });

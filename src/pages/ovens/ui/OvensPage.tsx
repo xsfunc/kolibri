@@ -3,11 +3,12 @@ import { Stats } from "@/widgets/stats";
 import { WalletBalances } from "@/widgets/wallet-balances";
 import { OvenList } from "@/widgets/oven-list";
 import { ConnectPrompt } from "@/features/connect-wallet";
-import { $isConnected } from "@/entities/wallet";
-import { css } from "styled-system/css";
+import { $walletState } from "@/entities/wallet";
+import { card, skeleton } from "@/shared/ui/styles";
+import { css, cx } from "styled-system/css";
 
 export const OvensPage = () => {
-  const isConnected = useUnit($isConnected);
+  const walletState = useUnit($walletState);
 
   return (
     <main
@@ -23,8 +24,43 @@ export const OvensPage = () => {
     >
       <div className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.lg)" })}>
         <Stats />
-        {isConnected && <WalletBalances />}
-        {isConnected ? <OvenList /> : <ConnectPrompt />}
+        {walletState === "CONNECTED" && <WalletBalances />}
+        {walletState === "CONNECTED" ? (
+          <OvenList />
+        ) : walletState === "INITIALIZING" ? (
+          <section
+            className={css({
+              display: "flex",
+              justifyContent: "center",
+              paddingTop: "token(spacing.md)",
+            })}
+          >
+            <div
+              className={cx(
+                card(),
+                css({
+                  width: "100%",
+                  alignItems: "center",
+                  textAlign: "center",
+                  gap: "token(spacing.sm)",
+                  paddingBlock: "token(spacing.xl)",
+                }),
+              )}
+            >
+              <div className={cx(skeleton({ shape: "circle" }), css({ margin: "0 auto" }))} />
+              <div className={cx(skeleton({ shape: "heading" }), css({ margin: "0 auto" }))} />
+              <div className={cx(skeleton({ shape: "text" }), css({ margin: "0 auto" }))} />
+              <div
+                className={cx(
+                  skeleton({ shape: "block" }),
+                  css({ maxWidth: "200px", margin: "0 auto" }),
+                )}
+              />
+            </div>
+          </section>
+        ) : (
+          <ConnectPrompt />
+        )}
       </div>
     </main>
   );

@@ -9,7 +9,7 @@ import {
   CURRENCIES,
   type Currency,
 } from "../model/transfer";
-import { $isConnected } from "@/entities/wallet";
+import { $isConnected, $isInitializing } from "@/entities/wallet";
 import { connectWalletFx } from "@/features/connect-wallet";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";
@@ -27,6 +27,7 @@ export const DonateDialog = () => {
   const open = useUnit($donateOpen);
   const close = useUnit(donateClosed);
   const isConnected = useUnit($isConnected);
+  const isInitializing = useUnit($isInitializing);
 
   const xtzPending = useUnit(donateXtzFx.pending);
   const kusdPending = useUnit(donateKusdFx.pending);
@@ -284,8 +285,12 @@ export const DonateDialog = () => {
         )}
 
         {!isConnected ? (
-          <Button onClick={handleConnect} disabled={txStatus === "pending"} variant="primary">
-            Connect Wallet
+          <Button
+            onClick={handleConnect}
+            disabled={isInitializing || txStatus === "pending"}
+            variant="primary"
+          >
+            {isInitializing ? "…" : "Connect Wallet"}
           </Button>
         ) : (
           <Button onClick={handleDonate} disabled={!canDonate} loading={pending} variant="primary">

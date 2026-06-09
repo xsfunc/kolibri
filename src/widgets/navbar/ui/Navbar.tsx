@@ -1,5 +1,5 @@
 import { useUnit } from "effector-react";
-import { $isConnected } from "@/entities/wallet";
+import { $walletState } from "@/entities/wallet";
 import { ConnectButton, WalletInfo } from "@/features/connect-wallet";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { donateOpened } from "@/features/donate";
@@ -8,7 +8,7 @@ import { css } from "styled-system/css";
 import { CodeXml, Settings, Heart } from "lucide-react";
 
 export const Navbar = () => {
-  const isConnected = useUnit($isConnected);
+  const walletState = useUnit($walletState);
 
   return (
     <header
@@ -91,7 +91,15 @@ export const Navbar = () => {
         >
           <Heart size={16} />
         </button>
-        {isConnected ? <WalletInfo /> : <ConnectButton />}
+        {walletState === "INITIALIZING" ? (
+          <button disabled className={button({ variant: "primary", size: "sm" })}>
+            …
+          </button>
+        ) : walletState === "CONNECTED" ? (
+          <WalletInfo />
+        ) : (
+          <ConnectButton />
+        )}
         <button
           onClick={() => rpcSettingsOpened()}
           aria-label="RPC settings"
