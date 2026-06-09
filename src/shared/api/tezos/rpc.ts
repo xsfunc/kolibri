@@ -1,7 +1,10 @@
-import { createStore } from "effector";
-
 const DEFAULT_RPC = "https://rpc.tzkt.io/mainnet";
 
-export const $rpcNode = createStore<string>(DEFAULT_RPC);
+let currentRpc = DEFAULT_RPC;
+
+export const getRpcNode = () => currentRpc;
+export const setRpcNode = (url: string) => {
+  currentRpc = url;
+};
 
 export { DEFAULT_RPC };

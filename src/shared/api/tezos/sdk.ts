@@ -1,7 +1,7 @@
 import type { BeaconWallet } from "@taquito/beacon-wallet";
 
 import { TezosToolkit } from "@taquito/taquito";
-import { $rpcNode } from "./rpc";
+import { getRpcNode } from "./rpc";
 import {
   CONTRACTS,
   HarbingerClient,
@@ -12,7 +12,7 @@ import {
   Network,
 } from "./kolibri";
 
-export const tezosToolkit = new TezosToolkit($rpcNode.defaultState);
+export const tezosToolkit = new TezosToolkit(getRpcNode());
 
 const CONTRACTS_MAIN = CONTRACTS.MAIN;
 

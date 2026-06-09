@@ -2,7 +2,7 @@ import { sample, combine, createEvent } from "effector";
 import { restoreSessionFx } from "@/features/connect-wallet";
 import { loadGlobalDataFx, loadOvensFx, ovensReset } from "@/entities/oven";
 import { walletConnected, walletDisconnected, $walletPKH, $isConnected } from "@/entities/wallet";
-import { rpcNodeChanged } from "@/features/rpc-settings";
+import { rpcNodeChanged } from "@/entities/rpc";
 
 export const appStarted = createEvent();
 
