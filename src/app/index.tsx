@@ -11,6 +11,12 @@ const RpcSettingsDialog = lazy(() =>
   })),
 );
 
+const DonateDialog = lazy(() =>
+  import("@/features/donate").then((m) => ({
+    default: m.DonateDialog,
+  })),
+);
+
 export const App = () => {
   useEffect(() => {
     appStarted();
@@ -22,6 +28,7 @@ export const App = () => {
       <OvensPage />
       <Suspense>
         <RpcSettingsDialog />
+        <DonateDialog />
       </Suspense>
     </Providers>
   );

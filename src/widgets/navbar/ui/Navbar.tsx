@@ -2,9 +2,10 @@ import { useUnit } from "effector-react";
 import { $isConnected } from "@/entities/wallet";
 import { ConnectButton, WalletInfo } from "@/features/connect-wallet";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
+import { donateOpened } from "@/features/donate";
 import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
-import { CodeXml, Settings } from "lucide-react";
+import { CodeXml, Settings, Heart } from "lucide-react";
 
 export const Navbar = () => {
   const isConnected = useUnit($isConnected);
@@ -81,6 +82,15 @@ export const Navbar = () => {
         >
           <CodeXml size={16} />
         </a>
+        <button
+          onClick={() => donateOpened()}
+          aria-label="Donate"
+          title="Donate"
+          className={button({ variant: "icon", size: "sm" })}
+          style={{ color: "#e84393" }}
+        >
+          <Heart size={16} />
+        </button>
         {isConnected ? <WalletInfo /> : <ConnectButton />}
         <button
           onClick={() => rpcSettingsOpened()}
