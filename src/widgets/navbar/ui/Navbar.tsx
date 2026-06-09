@@ -5,7 +5,7 @@ import { WalletInfo } from "@/features/connect-wallet/ui/WalletInfo";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
-import { Settings } from "lucide-react";
+import { CodeXml, Settings } from "lucide-react";
 
 export const Navbar = () => {
   const isConnected = useUnit($isConnected);
@@ -28,19 +28,60 @@ export const Navbar = () => {
         paddingRight: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
       })}
     >
-      <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.xs)" })}>
+      <div
+        className={css({
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: "0",
+        })}
+      >
         <span
           className={css({
-            textStyle: "headline-md",
+            fontSize: "16px",
+            lineHeight: "1.2",
             color: "token(colors.primary-fixed-dim)",
             fontWeight: "800",
             letterSpacing: "-0.04em",
           })}
         >
-          KOLIBRI
+          Kolibri
+        </span>
+        <span
+          className={css({
+            fontSize: "11px",
+            lineHeight: "1.2",
+            color: "token(colors.on-surface-variant)",
+          })}
+        >
+          Dashboard by{" "}
+          <a
+            href="https://x.com/xsfunc"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={css({
+              color: "token(colors.on-surface-variant)",
+              textDecoration: "underline",
+              textUnderlineOffset: "2px",
+              _hover: { color: "token(colors.primary-fixed-dim)" },
+            })}
+          >
+            xsfunc
+          </a>
         </span>
       </div>
       <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
+        <a
+          href="https://github.com/xsfunc/kolibri"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub repository"
+          title="Github Repository"
+          className={button({ variant: "icon", size: "sm" })}
+          style={{ color: "var(--colors-on-surface-variant)" }}
+        >
+          <CodeXml size={16} />
+        </a>
         {isConnected ? <WalletInfo /> : <ConnectButton />}
         <button
           onClick={() => rpcSettingsOpened()}
