@@ -14,7 +14,13 @@ import {
   $dialogOpen,
 } from "../model/model";
 import { getUtilLevel, levelStyles } from "@/shared/lib/utilization-levels";
-import { css } from "styled-system/css";
+import { skeleton } from "@/shared/ui/styles";
+import { css, cx } from "styled-system/css";
+
+const valueSkeleton = cx(
+  skeleton({ shape: "inline" }),
+  css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+);
 
 const TAB_ITEMS: { value: Tab; label: string }[] = [
   { value: "deposit", label: "Deposit" },
@@ -32,10 +38,10 @@ export const OvenManageDialog = () => {
 
   const collateralXtz = calc?.collateralXtz;
   const debtKusd = calc?.debtKusd;
-  const utilizationPct = calc?.utilizationPct ?? 0;
+  const utilizationPct = calc?.utilizationPct;
   const maxDebt = calc?.maxDebt;
   const collateralValueUsd = calc?.collateralValueUsd;
-  const healthLevel = getUtilLevel(utilizationPct);
+  const healthLevel = getUtilLevel(utilizationPct ?? 0);
 
   return (
     <Dialog
@@ -73,7 +79,11 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {collateralXtz ? formatToken(collateralXtz.toNumber(), "XTZ") : "—"}
+              {collateralXtz ? (
+                formatToken(collateralXtz.toNumber(), "XTZ")
+              ) : (
+                <span className={valueSkeleton} style={{ width: "8ch", display: "inline-block" }} />
+              )}
             </span>
           </div>
           <div
@@ -96,7 +106,11 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {debtKusd ? formatToken(debtKusd.toNumber(), "kUSD") : formatToken(0, "kUSD")}
+              {debtKusd != null ? (
+                formatToken(debtKusd.toNumber(), "kUSD")
+              ) : (
+                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+              )}
             </span>
           </div>
           <div
@@ -119,7 +133,11 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {maxDebt ? formatToken(maxDebt.toNumber(), "kUSD") : "—"}
+              {maxDebt ? (
+                formatToken(maxDebt.toNumber(), "kUSD")
+              ) : (
+                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+              )}
             </span>
           </div>
           <div
@@ -142,36 +160,42 @@ export const OvenManageDialog = () => {
                 color: levelStyles[healthLevel],
               })}
             >
-              {formatPercent(utilizationPct)}
+              {utilizationPct != null ? (
+                formatPercent(utilizationPct)
+              ) : (
+                <span className={valueSkeleton} style={{ width: "5ch", display: "inline-block" }} />
+              )}
             </span>
           </div>
-          {collateralValueUsd && (
-            <div
+          <div
+            className={css({
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "6px",
+              paddingTop: "6px",
+              borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+            })}
+          >
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Collateral Value
+            </span>
+            <span
               className={css({
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginTop: "6px",
-                paddingTop: "6px",
-                borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                textStyle: "body-sm",
+                fontWeight: "700",
+                fontVariantNumeric: "tabular-nums",
               })}
             >
-              <span
-                className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
-              >
-                Collateral Value
-              </span>
-              <span
-                className={css({
-                  textStyle: "body-sm",
-                  fontWeight: "700",
-                  fontVariantNumeric: "tabular-nums",
-                })}
-              >
-                {formatUsd(collateralValueUsd.toNumber())}
-              </span>
-            </div>
-          )}
+              {collateralValueUsd ? (
+                formatUsd(collateralValueUsd.toNumber())
+              ) : (
+                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+              )}
+            </span>
+          </div>
         </div>
 
         <div

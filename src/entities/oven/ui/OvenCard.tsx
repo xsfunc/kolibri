@@ -3,7 +3,7 @@ import { $ownedOvens, $ovenHealthMap, type HealthLevel } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
 import { $ovenCalculations } from "../model/calculations";
 import { card, skeleton } from "@/shared/ui/styles";
-import { css } from "styled-system/css";
+import { css, cx } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
 import { truncateAddress, formatToken, formatUsd, formatPercent } from "@/shared/lib/format";
@@ -67,11 +67,45 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                 {truncateAddress(ovenAddress)}
               </a>
             </h4>
-            <div className={skeleton({ shape: "text" })} style={{ marginTop: "4px" }} />
+            <p
+              className={css({
+                textStyle: "body-sm",
+                color: "token(colors.on-surface-variant)",
+                margin: "0",
+              })}
+            >
+              Status:{" "}
+              <span
+                className={cx(
+                  skeleton({ shape: "inline" }),
+                  css({ textStyle: "body-sm", fontVariantNumeric: "tabular-nums" }),
+                )}
+                style={{ width: "5ch", display: "inline-block", verticalAlign: "middle" }}
+              />
+            </p>
           </div>
         </div>
 
-        <div className={skeleton({ shape: "text" })} style={{ width: "50%" }} />
+        <p
+          className={css({
+            textStyle: "body-sm",
+            color: "token(colors.on-surface-variant)",
+            margin: "0",
+          })}
+        >
+          Baker{" "}
+          <span
+            className={cx(
+              skeleton({ shape: "inline" }),
+              css({
+                textStyle: "body-sm",
+                color: "token(colors.primary-fixed-dim)",
+                fontVariantNumeric: "tabular-nums",
+              }),
+            )}
+            style={{ width: "8ch", display: "inline-block", verticalAlign: "middle" }}
+          />
+        </p>
 
         <div
           className={css({
@@ -88,8 +122,22 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               alignItems: "center",
             })}
           >
-            <div className={skeleton({ shape: "text" })} style={{ width: "45%" }} />
-            <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Collateral Utilization
+            </span>
+            <span
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-sm",
+                  fontWeight: "700",
+                  fontVariantNumeric: "tabular-nums",
+                }),
+              )}
+              style={{ width: "5ch" }}
+            />
           </div>
           <div
             className={css({
@@ -98,17 +146,33 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               alignItems: "center",
             })}
           >
-            <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
-            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Liquidatable at
+            </span>
+            <span
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-sm",
+                  fontWeight: "700",
+                  fontVariantNumeric: "tabular-nums",
+                }),
+              )}
+              style={{ width: "6ch" }}
+            />
           </div>
         </div>
 
         <div
-          className={skeleton({ shape: "block" })}
+          className={cx(skeleton({ shape: "inline" }))}
           style={{
             height: "4px",
             borderRadius: "token(radii.full)",
             marginBottom: "token(spacing.sm)",
+            width: "100%",
+            display: "block",
           }}
         />
 
@@ -129,8 +193,22 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               borderBottom: "1px solid rgba(255,255,255,0.05)",
             })}
           >
-            <div className={skeleton({ shape: "text" })} style={{ width: "40%" }} />
-            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Collateral Value
+            </span>
+            <span
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-sm",
+                  fontWeight: "700",
+                  fontVariantNumeric: "tabular-nums",
+                }),
+              )}
+              style={{ width: "7ch" }}
+            />
           </div>
           <div
             className={css({
@@ -141,8 +219,22 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               borderBottom: "1px solid rgba(255,255,255,0.05)",
             })}
           >
-            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
-            <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Balance
+            </span>
+            <span
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-sm",
+                  fontWeight: "700",
+                  fontVariantNumeric: "tabular-nums",
+                }),
+              )}
+              style={{ width: "8ch" }}
+            />
           </div>
           <div
             className={css({
@@ -152,8 +244,22 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               paddingY: "3px",
             })}
           >
-            <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
-            <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+            <span
+              className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}
+            >
+              Loan Amt
+            </span>
+            <span
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-sm",
+                  fontWeight: "700",
+                  fontVariantNumeric: "tabular-nums",
+                }),
+              )}
+              style={{ width: "7ch" }}
+            />
           </div>
         </div>
 
@@ -170,9 +276,9 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
   const collateralXtz = calc?.collateralXtz ?? oven.balance.dividedBy(1e6);
   const debtKusd = calc?.debtKusd ?? oven.outstandingTokens.dividedBy(1e18);
   const collateralValueUsd = calc?.collateralValueUsd ?? null;
-  const utilizationPct = calc?.utilizationPct ?? 0;
+  const utilizationPct = calc?.utilizationPct;
   const liquidationPrice = calc?.liquidationPrice ?? null;
-  const utilLevel = getUtilLevel(utilizationPct);
+  const utilLevel = getUtilLevel(utilizationPct ?? 0);
 
   return (
     <div
@@ -269,7 +375,21 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               color: levelStyles[utilLevel],
             })}
           >
-            {formatPercent(utilizationPct)}
+            {utilizationPct != null ? (
+              formatPercent(utilizationPct)
+            ) : (
+              <span
+                className={cx(
+                  skeleton({ shape: "inline" }),
+                  css({
+                    textStyle: "body-sm",
+                    fontWeight: "700",
+                    fontVariantNumeric: "tabular-nums",
+                  }),
+                )}
+                style={{ width: "5ch", display: "inline-block" }}
+              />
+            )}
           </span>
         </div>
         <div
@@ -291,13 +411,41 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {liquidationPrice ? formatUsd(liquidationPrice.toNumber()) : "none"}
+            {liquidationPrice != null ? (
+              formatUsd(liquidationPrice.toNumber())
+            ) : calc != null ? (
+              "—"
+            ) : (
+              <span
+                className={cx(
+                  skeleton({ shape: "inline" }),
+                  css({
+                    textStyle: "body-sm",
+                    fontWeight: "700",
+                    fontVariantNumeric: "tabular-nums",
+                  }),
+                )}
+                style={{ width: "6ch", display: "inline-block" }}
+              />
+            )}
           </span>
         </div>
       </div>
 
       <div className={css({ marginBottom: "token(spacing.sm)" })}>
-        <Progress value={utilizationPct} max={100} level={utilLevel} />
+        {utilizationPct != null ? (
+          <Progress value={utilizationPct} max={100} level={utilLevel} />
+        ) : (
+          <div
+            className={cx(skeleton({ shape: "inline" }))}
+            style={{
+              height: "4px",
+              borderRadius: "token(radii.full)",
+              width: "100%",
+              display: "block",
+            }}
+          />
+        )}
       </div>
 
       <div
@@ -329,7 +477,21 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {collateralValueUsd ? formatUsd(collateralValueUsd.toNumber()) : "—"}
+            {collateralValueUsd != null ? (
+              formatUsd(collateralValueUsd.toNumber())
+            ) : (
+              <span
+                className={cx(
+                  skeleton({ shape: "inline" }),
+                  css({
+                    textStyle: "body-sm",
+                    fontWeight: "700",
+                    fontVariantNumeric: "tabular-nums",
+                  }),
+                )}
+                style={{ width: "7ch", display: "inline-block" }}
+              />
+            )}
           </span>
         </div>
         <div
@@ -409,12 +571,53 @@ export const SkeletonOvenCard = () => (
       })}
     >
       <div>
-        <div className={skeleton({ shape: "heading" })} />
-        <div className={skeleton({ shape: "text" })} style={{ marginTop: "4px" }} />
+        <div
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700" }),
+          )}
+          style={{ width: "10ch" }}
+        />
+        <p
+          className={css({
+            textStyle: "body-sm",
+            color: "token(colors.on-surface-variant)",
+            margin: "0",
+            marginTop: "4px",
+          })}
+        >
+          Status:{" "}
+          <span
+            className={cx(
+              skeleton({ shape: "inline" }),
+              css({ textStyle: "body-sm", fontVariantNumeric: "tabular-nums" }),
+            )}
+            style={{ width: "5ch", display: "inline-block", verticalAlign: "middle" }}
+          />
+        </p>
       </div>
     </div>
 
-    <div className={skeleton({ shape: "text" })} style={{ width: "50%" }} />
+    <p
+      className={css({
+        textStyle: "body-sm",
+        color: "token(colors.on-surface-variant)",
+        margin: "0",
+      })}
+    >
+      Baker{" "}
+      <span
+        className={cx(
+          skeleton({ shape: "inline" }),
+          css({
+            textStyle: "body-sm",
+            color: "token(colors.primary-fixed-dim)",
+            fontVariantNumeric: "tabular-nums",
+          }),
+        )}
+        style={{ width: "8ch", display: "inline-block", verticalAlign: "middle" }}
+      />
+    </p>
 
     <div
       className={css({
@@ -431,8 +634,16 @@ export const SkeletonOvenCard = () => (
           alignItems: "center",
         })}
       >
-        <div className={skeleton({ shape: "text" })} style={{ width: "45%" }} />
-        <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
+        <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
+          Collateral Utilization
+        </span>
+        <span
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+          )}
+          style={{ width: "5ch" }}
+        />
       </div>
       <div
         className={css({
@@ -441,17 +652,27 @@ export const SkeletonOvenCard = () => (
           alignItems: "center",
         })}
       >
-        <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
-        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+        <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
+          Liquidatable at
+        </span>
+        <span
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+          )}
+          style={{ width: "6ch" }}
+        />
       </div>
     </div>
 
     <div
-      className={skeleton({ shape: "block" })}
+      className={cx(skeleton({ shape: "inline" }))}
       style={{
         height: "4px",
         borderRadius: "token(radii.full)",
         marginBottom: "token(spacing.sm)",
+        width: "100%",
+        display: "block",
       }}
     />
 
@@ -472,8 +693,16 @@ export const SkeletonOvenCard = () => (
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         })}
       >
-        <div className={skeleton({ shape: "text" })} style={{ width: "40%" }} />
-        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+        <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
+          Collateral Value
+        </span>
+        <span
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+          )}
+          style={{ width: "7ch" }}
+        />
       </div>
       <div
         className={css({
@@ -484,8 +713,16 @@ export const SkeletonOvenCard = () => (
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         })}
       >
-        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
-        <div className={skeleton({ shape: "text" })} style={{ width: "35%" }} />
+        <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
+          Balance
+        </span>
+        <span
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+          )}
+          style={{ width: "8ch" }}
+        />
       </div>
       <div
         className={css({
@@ -495,8 +732,16 @@ export const SkeletonOvenCard = () => (
           paddingY: "3px",
         })}
       >
-        <div className={skeleton({ shape: "text" })} style={{ width: "25%" }} />
-        <div className={skeleton({ shape: "text" })} style={{ width: "30%" }} />
+        <span className={css({ textStyle: "body-sm", color: "token(colors.on-surface-variant)" })}>
+          Loan Amt
+        </span>
+        <span
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+          )}
+          style={{ width: "7ch" }}
+        />
       </div>
     </div>
 

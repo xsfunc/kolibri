@@ -11,7 +11,7 @@ import {
 } from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
 import { formatUsd, formatPercent } from "@/shared/lib/format";
-import { css } from "styled-system/css";
+import { css, cx } from "styled-system/css";
 import { TrendingUp, Shield, Percent, Coins } from "lucide-react";
 
 type KusdPriceLevel = "safe" | "warning" | "danger";
@@ -44,6 +44,7 @@ const statCards = [
     iconBg: "rgba(0, 218, 248, 0.15)",
     iconColor: "token(colors.secondary-fixed-dim)",
     label: "XTZ Price",
+    skeletonWidth: "8ch",
     getValue: (priceData: PriceData | null) =>
       priceData ? formatUsd(priceData.price.toNumber(), 4) : "—",
   },
@@ -53,6 +54,7 @@ const statCards = [
     iconBg: "",
     iconColor: "",
     label: "kUSD Price",
+    skeletonWidth: "6ch",
     getValue: (kusdPriceData: KusdPriceData | null) =>
       kusdPriceData ? formatUsd(kusdPriceData.price.toNumber(), 2) : "—",
   },
@@ -62,6 +64,7 @@ const statCards = [
     iconBg: "rgba(0, 226, 144, 0.15)",
     iconColor: "token(colors.primary-fixed-dim)",
     label: "Stability Fee",
+    skeletonWidth: "5ch",
     getValue: (_: unknown, minterData: MinterData) =>
       minterData.stabilityFee != null ? formatPercent(minterData.stabilityFee!.toNumber()) : "—",
   },
@@ -71,6 +74,7 @@ const statCards = [
     iconBg: "rgba(228, 196, 81, 0.15)",
     iconColor: "token(colors.tertiary-fixed-dim)",
     label: "Collateral Rate",
+    skeletonWidth: "5ch",
     getValue: (_: unknown, minterData: MinterData) =>
       minterData.collateralRate != null
         ? formatPercent(minterData.collateralRate!.toNumber())
@@ -147,7 +151,18 @@ export const Stats = () => {
                   {stat.label}
                 </span>
                 {loading && !hasData ? (
-                  <div className={skeleton({ shape: "heading" })} />
+                  <div
+                    className={cx(
+                      skeleton({ shape: "inline" }),
+                      css({
+                        textStyle: "body-lg",
+                        fontWeight: "600",
+                        fontVariantNumeric: "tabular-nums",
+                        height: "28px",
+                      }),
+                    )}
+                    style={{ width: stat.skeletonWidth }}
+                  />
                 ) : (
                   <span
                     className={css({

@@ -148,6 +148,7 @@ export const skeleton = cva({
   },
   variants: {
     shape: {
+      inline: { borderRadius: "token(radii.sm)", _before: { content: '"\\00a0"' } },
       text: { height: "14px", width: "60%" },
       heading: { height: "22px", width: "40%" },
       circle: { borderRadius: "token(radii.full)", width: "40px", height: "40px" },

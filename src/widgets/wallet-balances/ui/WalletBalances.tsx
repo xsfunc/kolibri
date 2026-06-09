@@ -79,7 +79,18 @@ export const WalletBalances = () => {
             kUSD
           </span>
           {isLoading ? (
-            <div className={skeleton({ shape: "heading" })} />
+            <div
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-md",
+                  fontWeight: "600",
+                  fontVariantNumeric: "tabular-nums",
+                  height: "24px",
+                }),
+              )}
+              style={{ width: "10ch" }}
+            />
           ) : (
             <span
               className={css({
@@ -111,7 +122,18 @@ export const WalletBalances = () => {
             XTZ
           </span>
           {isLoading ? (
-            <div className={skeleton({ shape: "heading" })} />
+            <div
+              className={cx(
+                skeleton({ shape: "inline" }),
+                css({
+                  textStyle: "body-md",
+                  fontWeight: "600",
+                  fontVariantNumeric: "tabular-nums",
+                  height: "24px",
+                }),
+              )}
+              style={{ width: "10ch" }}
+            />
           ) : (
             <span
               className={css({
