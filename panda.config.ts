@@ -65,7 +65,8 @@ export default defineConfig({
         },
         fonts: {
           sans: {
-            value: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            value:
+              "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
           },
           mono: {
             value:
