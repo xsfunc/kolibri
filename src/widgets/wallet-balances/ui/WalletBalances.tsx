@@ -9,7 +9,6 @@ import { $priceData, $kusdPriceData } from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
 import { formatToken, formatUsd } from "@/shared/lib/format";
 import { css, cx } from "styled-system/css";
-import { Wallet } from "lucide-react";
 
 export const WalletBalances = () => {
   const { kUSD, xtz, isConnected, loading, priceData, kusdPriceData } = useUnit({
@@ -41,19 +40,6 @@ export const WalletBalances = () => {
           marginBottom: "token(spacing.md)",
         })}
       >
-        <div
-          className={css({
-            width: "32px",
-            height: "32px",
-            borderRadius: "token(radii.full)",
-            bg: "rgba(0, 226, 144, 0.15)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          })}
-        >
-          <Wallet size={16} className={cx(css({ color: "token(colors.primary-fixed-dim)" }))} />
-        </div>
         <span
           className={css({
             textStyle: "label-md",
@@ -81,7 +67,7 @@ export const WalletBalances = () => {
         >
           <span
             className={css({
-              textStyle: "label-sm",
+              textStyle: "label-md",
               color: "token(colors.on-surface-variant)",
               display: "block",
               marginBottom: "token(spacing.xs)",
@@ -124,7 +110,7 @@ export const WalletBalances = () => {
         >
           <span
             className={css({
-              textStyle: "label-sm",
+              textStyle: "label-md",
               color: "token(colors.on-surface-variant)",
               display: "block",
               marginBottom: "token(spacing.xs)",

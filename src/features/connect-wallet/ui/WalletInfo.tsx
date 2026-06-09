@@ -24,7 +24,8 @@ export const WalletInfo = () => {
         gap: "token(spacing.xs)",
         bg: "rgba(0, 255, 163, 0.08)",
         borderRadius: "token(radii.full)",
-        px: "3",
+        paddingLeft: "3",
+        paddingRight: "1.5",
         py: "1",
       })}
     >
