@@ -1,5 +1,4 @@
 import { BigNumber } from "@/shared/lib/bignumber";
-
 export { BigNumber };
 
 export const MUTEZ = new BigNumber(10).pow(6);

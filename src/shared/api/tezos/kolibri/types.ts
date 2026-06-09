@@ -128,3 +128,9 @@ export type HarbingerPriceFeedData = {
   time: Date;
   price: Mutez;
 };
+
+export type KusdPriceData = {
+  price: BigNumber;
+  pegPercent: BigNumber;
+  timestamp: number;
+};

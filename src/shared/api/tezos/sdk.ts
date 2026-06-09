@@ -1,19 +1,29 @@
-import { TezosToolkit } from "@taquito/taquito";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
-import { CONTRACTS, HarbingerClient, StableCoinClient, TokenClient, Network } from "./kolibri";
-import { OvenClient } from "./kolibri";
-import { $rpcNode } from "./rpc";
 
-const CONTRACTS_MAIN = CONTRACTS.MAIN;
+import { TezosToolkit } from "@taquito/taquito";
+import { $rpcNode } from "./rpc";
+import {
+  CONTRACTS,
+  HarbingerClient,
+  KusdPriceClient,
+  StableCoinClient,
+  TokenClient,
+  OvenClient,
+  Network,
+} from "./kolibri";
 
 export const tezosToolkit = new TezosToolkit($rpcNode.defaultState);
 
+const CONTRACTS_MAIN = CONTRACTS.MAIN;
+
+const ovenClientCache = new Map<string, OvenClient>();
+const tokenClient = new TokenClient(tezosToolkit, CONTRACTS_MAIN.TOKEN!);
+const kusdPriceClient = new KusdPriceClient(tezosToolkit, CONTRACTS_MAIN.DEXES.QUIPUSWAP.POOL!);
 const harbingerClient = new HarbingerClient(
   tezosToolkit,
   CONTRACTS_MAIN.HARBINGER_NORMALIZER!,
   CONTRACTS_MAIN.MINTER!,
 );
-
 const stableCoinClient = new StableCoinClient(
   tezosToolkit,
   Network.Mainnet,
@@ -21,10 +31,6 @@ const stableCoinClient = new StableCoinClient(
   CONTRACTS_MAIN.MINTER!,
   CONTRACTS_MAIN.OVEN_FACTORY!,
 );
-
-const tokenClient = new TokenClient(tezosToolkit, CONTRACTS_MAIN.TOKEN!);
-
-const ovenClientCache = new Map<string, OvenClient>();
 
 export const getOvenClient = (ovenAddress: string): OvenClient => {
   const cached = ovenClientCache.get(ovenAddress);
@@ -46,4 +52,4 @@ export function clearOvenCache(): void {
   ovenClientCache.clear();
 }
 
-export { stableCoinClient, tokenClient, CONTRACTS_MAIN as NETWORK_CONTRACTS };
+export { stableCoinClient, tokenClient, kusdPriceClient, CONTRACTS_MAIN as NETWORK_CONTRACTS };
