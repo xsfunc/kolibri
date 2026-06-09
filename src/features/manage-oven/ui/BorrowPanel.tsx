@@ -1,59 +1,132 @@
-import { useState } from "react";
 import { useUnit } from "effector-react";
-import { borrowFx } from "../model/model";
-import { BigNumber } from "@/shared/lib/bignumber";
 import { Button } from "@/shared/ui/Button";
-import { Input } from "@/shared/ui/Input";
+import {
+  $borrowAmount,
+  borrowAmountChanged,
+  $borrowError,
+  $borrowPending,
+  borrowMaxClicked,
+  borrowSubmitted,
+  $currentUtilization,
+  $borrowProjectedUtil,
+} from "../model/model";
+import { UtilizationPreview } from "./UtilizationPreview";
 import { css } from "../../../../styled-system/css";
 
-interface BorrowPanelProps {
-  ovenAddress: string;
-  onClose: () => void;
-  disabled?: boolean;
-}
-
-export const BorrowPanel = ({ ovenAddress, onClose, disabled }: BorrowPanelProps) => {
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState("");
-  const { borrow, pending } = useUnit({ borrow: borrowFx, pending: borrowFx.pending });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount || Number(amount) <= 0) {
-      setError("Amount must be greater than 0");
-      return;
-    }
-    const shard = new BigNumber(amount).multipliedBy(1e18).integerValue().toString();
-    try {
-      await borrow({ ovenAddress, amount: shard });
-      onClose();
-    } catch {
-      setError("Borrow failed");
-    }
-  };
+export const BorrowPanel = () => {
+  const amount = useUnit($borrowAmount);
+  const error = useUnit($borrowError);
+  const pending = useUnit($borrowPending);
+  const onAmountChange = useUnit(borrowAmountChanged);
+  const onMax = useUnit(borrowMaxClicked);
+  const onSubmit = useUnit(borrowSubmitted);
+  const currentUtil = useUnit($currentUtilization);
+  const projectedUtil = useUnit($borrowProjectedUtil);
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
       className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.md)" })}
     >
-      <Input
-        label="Amount (kUSD)"
-        type="number"
-        min="0"
-        step="0.01"
-        value={amount}
-        onChange={(e) => {
-          setAmount(e.target.value);
-          setError("");
-        }}
-        placeholder="0.00"
-        suffix="kUSD"
-        error={error}
-        id="borrow-amount"
-        disabled={disabled}
-      />
-      <Button type="submit" disabled={disabled || pending || !amount} loading={pending}>
+      <div>
+        <span
+          className={css({
+            display: "block",
+            textStyle: "label-md",
+            color: "token(colors.on-surface-variant)",
+            marginBottom: "6px",
+          })}
+        >
+          Amount
+        </span>
+        <div
+          className={css({
+            display: "flex",
+            alignItems: "center",
+            bg: "token(colors.surface-container)",
+            border: "1px solid token(colors.outline-variant)",
+            borderRadius: "token(radii.md)",
+            overflow: "hidden",
+            transition: "border-color 150ms ease, box-shadow 150ms ease",
+            _focusWithin: {
+              borderColor: "token(colors.surface-tint)",
+              boxShadow: "0 0 0 1px token(colors.surface-tint)",
+            },
+          })}
+        >
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={amount}
+            onChange={(e) => onAmountChange(e.target.value)}
+            placeholder="0.00"
+            disabled={pending}
+            className={css({
+              bg: "transparent",
+              border: "none",
+              outline: "none",
+              color: "token(colors.on-surface)",
+              padding: "8px 12px",
+              fontSize: "16px",
+              lineHeight: "24px",
+              width: "100%",
+              _placeholder: { color: "token(colors.on-surface-variant)" },
+              _disabled: { opacity: "0.5" },
+            })}
+          />
+          <button
+            type="button"
+            onClick={() => onMax()}
+            disabled={pending}
+            className={css({
+              padding: "2px 8px",
+              borderRadius: "token(radii.full)",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "11px",
+              fontWeight: "600",
+              letterSpacing: "0.03em",
+              transition: "all 150ms ease",
+              bg: "rgba(0, 255, 163, 0.15)",
+              color: "token(colors.primary-fixed-dim)",
+              _hover: { bg: "rgba(0, 255, 163, 0.25)" },
+              _active: { transform: "scale(0.93)" },
+              _disabled: { opacity: "0.5", cursor: "not-allowed" },
+            })}
+          >
+            MAX
+          </button>
+          <span
+            className={css({
+              padding: "0 10px",
+              color: "token(colors.on-surface-variant)",
+              textStyle: "body-sm",
+              fontWeight: "600",
+              flexShrink: "0",
+            })}
+          >
+            kUSD
+          </span>
+        </div>
+        <UtilizationPreview current={currentUtil} projected={projectedUtil} />
+        {error && (
+          <p
+            className={css({
+              textStyle: "body-sm",
+              color: "token(colors.error)",
+              marginTop: "6px",
+              margin: "6px 0 0",
+            })}
+          >
+            {error}
+          </p>
+        )}
+      </div>
+      <Button type="submit" disabled={pending || !amount} loading={pending}>
         Borrow
       </Button>
     </form>

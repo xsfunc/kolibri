@@ -15,6 +15,7 @@ import { Progress } from "@/shared/ui/Progress";
 import { css } from "../../../../styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
+import { dialogOpened, $dialogOpen, type Tab } from "@/features/manage-oven";
 
 const OvenManageDialog = lazy(() =>
   import("@/features/manage-oven").then((m) => ({
@@ -28,26 +29,27 @@ const SetBakerDialog = lazy(() =>
 );
 
 export const OvenList = () => {
-  const { ovenList, loading, pending, pkh, load, progress, pendingAddresses } = useUnit({
-    ovenList: $ovenList,
-    loading: $ovensLoading,
-    pending: $ovensLoadPending,
-    pkh: $walletPKH,
-    load: loadOvensFx,
-    progress: $ovensLoadProgress,
-    pendingAddresses: $ovenAddressesPending,
-  });
+  const { ovenList, loading, pending, pkh, load, progress, pendingAddresses, dialogOpen } = useUnit(
+    {
+      ovenList: $ovenList,
+      loading: $ovensLoading,
+      pending: $ovensLoadPending,
+      pkh: $walletPKH,
+      load: loadOvensFx,
+      progress: $ovensLoadProgress,
+      pendingAddresses: $ovenAddressesPending,
+      dialogOpen: $dialogOpen,
+    },
+  );
 
-  const [manageOven, setManageOven] = useState<string | null>(null);
-  const [manageTab, setManageTab] = useState<string>("deposit");
+  const openDialog = useUnit(dialogOpened);
   const [bakerOven, setBakerOven] = useState<string | null>(null);
 
   const handleAction = (ovenAddress: string, action: string) => {
     if (action === "baker") {
       setBakerOven(ovenAddress);
     } else {
-      setManageTab(action);
-      setManageOven(ovenAddress);
+      openDialog({ ovenAddress, tab: action as Tab });
     }
   };
 
@@ -138,14 +140,9 @@ export const OvenList = () => {
         </div>
       )}
 
-      {manageOven && (
+      {dialogOpen && (
         <Suspense>
-          <OvenManageDialog
-            ovenAddress={manageOven}
-            open={true}
-            onClose={() => setManageOven(null)}
-            initialTab={manageTab}
-          />
+          <OvenManageDialog />
         </Suspense>
       )}
 

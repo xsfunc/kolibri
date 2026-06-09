@@ -7,29 +7,17 @@ import { css } from "../../../../styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
 import { truncateAddress, numberWithCommas, formatUsd } from "@/shared/lib/format";
+import {
+  levelStyles,
+  getUtilLevel,
+  levelColors,
+  levelOutlinedVariant,
+} from "@/shared/lib/utilization-levels";
 
 interface OvenCardProps {
   ovenAddress: string;
   onAction: (action: string) => void;
 }
-
-const borderColors: Record<HealthLevel, string> = {
-  safe: "token(colors.primary-fixed-dim)",
-  warning: "token(colors.tertiary-fixed-dim)",
-  danger: "token(colors.error)",
-};
-
-const textColors: Record<HealthLevel, string> = {
-  safe: "token(colors.primary-fixed-dim)",
-  warning: "token(colors.tertiary-fixed-dim)",
-  danger: "token(colors.error)",
-};
-
-const outlinedVariant: Record<HealthLevel, "outlined" | "outlined-warning" | "outlined-danger"> = {
-  safe: "outlined",
-  warning: "outlined-warning",
-  danger: "outlined-danger",
-};
 
 export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
   const { ovens, refreshingAddress, healthMap, calculations } = useUnit({
@@ -184,11 +172,12 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
   const collateralValueUsd = calc?.collateralValueUsd ?? null;
   const utilizationPct = calc?.utilizationPct ?? 0;
   const liquidationPrice = calc?.liquidationPrice ?? null;
+  const utilLevel = getUtilLevel(utilizationPct);
 
   return (
     <div
       className={card()}
-      style={{ borderLeftWidth: "4px", borderLeftColor: borderColors[healthLevel] }}
+      style={{ borderLeftWidth: "4px", borderLeftColor: levelColors[healthLevel] }}
     >
       <div
         className={css({
@@ -204,7 +193,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               textStyle: "body-sm",
               fontWeight: "700",
               margin: "0",
-              color: textColors[healthLevel],
+              color: levelStyles[healthLevel],
             })}
           >
             <a
@@ -277,6 +266,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               textStyle: "body-sm",
               fontWeight: "700",
               fontVariantNumeric: "tabular-nums",
+              color: levelStyles[utilLevel],
             })}
           >
             {utilizationPct.toFixed(2)}%
@@ -307,7 +297,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
       </div>
 
       <div className={css({ marginBottom: "token(spacing.sm)" })}>
-        <Progress value={utilizationPct} max={100} level={healthLevel} />
+        <Progress value={utilizationPct} max={100} level={utilLevel} />
       </div>
 
       <div
@@ -392,7 +382,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
       </div>
 
       <Button
-        variant={outlinedVariant[healthLevel]}
+        variant={levelOutlinedVariant[healthLevel]}
         size="sm"
         disabled={isRefreshing}
         onClick={() => onAction("deposit")}
