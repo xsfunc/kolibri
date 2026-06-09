@@ -1,7 +1,5 @@
 import { createEffect, sample, attach } from "effector";
-import { BeaconWallet } from "@taquito/beacon-wallet";
-import { BeaconEvent } from "@taquito/beacon-wallet";
-import { NetworkType } from "@ecadlabs/beacon-types";
+import type { BeaconWallet } from "@taquito/beacon-wallet";
 import {
   walletConnected,
   walletConnecting,
@@ -11,11 +9,17 @@ import {
 } from "@/entities/wallet/model/model";
 import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos/sdk";
 
-// ─── Effects ─────────────────────────────────────────────────────────────────
-
-export const connectWalletFx = createEffect(async () => {
+async function createWallet() {
+  const { BeaconWallet } = await import("@taquito/beacon-wallet");
+  const { BeaconEvent } = await import("@taquito/beacon-wallet");
+  const { NetworkType } = await import("@ecadlabs/beacon-types");
   const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
   void wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
+  return wallet;
+}
+
+export const connectWalletFx = createEffect(async () => {
+  const wallet = await createWallet();
   await wallet.requestPermissions();
   const pkh = await wallet.getPKH();
   return { wallet, pkh };
@@ -26,8 +30,7 @@ export const disconnectWalletFx = createEffect(async (wallet: BeaconWallet) => {
 });
 
 export const restoreSessionFx = createEffect(async () => {
-  const wallet = new BeaconWallet({ name: "Kolibri", network: { type: NetworkType.MAINNET } });
-  void wallet.client.subscribeToEvent(BeaconEvent.ACTIVE_ACCOUNT_SET, () => {});
+  const wallet = await createWallet();
   const activeAccount = await wallet.client.getActiveAccount();
   if (!activeAccount) return null;
   const pkh = await wallet.getPKH();

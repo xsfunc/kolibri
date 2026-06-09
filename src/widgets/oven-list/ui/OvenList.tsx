@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useUnit } from "effector-react";
 import {
   $ovenList,
@@ -10,13 +10,22 @@ import { $ovensLoadPending } from "@/entities/oven/model/loadOvens";
 import { $walletPKH } from "@/entities/wallet/model/model";
 import { loadOvensFx } from "@/entities/oven/model/loadOvens";
 import { OvenCard } from "@/entities/oven";
-import { OvenManageDialog } from "@/features/manage-oven";
-import { SetBakerDialog } from "@/features/set-baker";
 import { Button } from "@/shared/ui/Button";
 import { Progress } from "@/shared/ui/Progress";
 import { css } from "../../../../styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
+
+const OvenManageDialog = lazy(() =>
+  import("@/features/manage-oven/ui/OvenManageDialog").then((m) => ({
+    default: m.OvenManageDialog,
+  })),
+);
+const SetBakerDialog = lazy(() =>
+  import("@/features/set-baker/ui/SetBakerDialog").then((m) => ({
+    default: m.SetBakerDialog,
+  })),
+);
 
 export const OvenList = () => {
   const { ovenList, loading, pending, pkh, load, progress, pendingAddresses } = useUnit({
@@ -130,16 +139,20 @@ export const OvenList = () => {
       )}
 
       {manageOven && (
-        <OvenManageDialog
-          ovenAddress={manageOven}
-          open={true}
-          onClose={() => setManageOven(null)}
-          initialTab={manageTab}
-        />
+        <Suspense>
+          <OvenManageDialog
+            ovenAddress={manageOven}
+            open={true}
+            onClose={() => setManageOven(null)}
+            initialTab={manageTab}
+          />
+        </Suspense>
       )}
 
       {bakerOven && (
-        <SetBakerDialog ovenAddress={bakerOven} open={true} onClose={() => setBakerOven(null)} />
+        <Suspense>
+          <SetBakerDialog ovenAddress={bakerOven} open={true} onClose={() => setBakerOven(null)} />
+        </Suspense>
       )}
     </div>
   );
