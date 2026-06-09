@@ -122,7 +122,7 @@ export const input = cva({
   base: {
     bg: "token(colors.surface-container)",
     border: "1px solid token(colors.outline-variant)",
-    borderRadius: "token(radii.DEFAULT)",
+    borderRadius: "token(radii.md)",
     color: "token(colors.on-surface)",
     padding: "8px 12px",
     fontSize: "16px",
@@ -197,6 +197,31 @@ export const progressTrack = cva({
     overflow: "hidden",
     height: "4px",
     width: "100%",
+  },
+});
+
+export const radioCard = cva({
+  base: {
+    display: "flex",
+    alignItems: "center",
+    gap: "token(spacing.sm)",
+    bg: "token(colors.surface-container)",
+    border: "1px solid token(colors.outline-variant)",
+    borderRadius: "token(radii.md)",
+    padding: "token(spacing.sm)",
+    cursor: "pointer",
+    outline: "none",
+    transition: "all 150ms ease",
+    _hover: {
+      bg: "token(colors.surface-container-high)",
+    },
+    _focusVisible: {
+      boxShadow: "0 0 0 2px token(colors.surface-tint)",
+    },
+    "&[data-checked]": {
+      borderColor: "token(colors.primary-container)",
+      bg: "rgba(0, 255, 163, 0.06)",
+    },
   },
 });
 
