@@ -1,9 +1,3 @@
-export const numberWithCommas = (str: string | number): string => {
-  const parts = str.toString().split(".");
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  return parts.join(".");
-};
-
 export const truncateAddress = (address: string, chars = 5): string => {
   if (address.length <= chars * 2 + 3) return address;
   return `${address.slice(0, chars)}...${address.slice(-chars)}`;
@@ -26,8 +20,20 @@ export const formatNumber = (num: number | string, places = 2): string =>
     maximumFractionDigits: places,
   });
 
-export const formatUsd = (value: number | string): string => {
+export const formatToken = (value: number | string, symbol: string, decimals = 2): string => {
   const num = Number(value);
   if (!isFinite(num)) return "—";
-  return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `${num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })} ${symbol}`;
+};
+
+export const formatPercent = (value: number | string, decimals = 2): string => {
+  const num = Number(value);
+  if (!isFinite(num)) return "—";
+  return `${num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}%`;
+};
+
+export const formatUsd = (value: number | string, decimals = 2): string => {
+  const num = Number(value);
+  if (!isFinite(num)) return "—";
+  return formatToken(num, "$", decimals);
 };

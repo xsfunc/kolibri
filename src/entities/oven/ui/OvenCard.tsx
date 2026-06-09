@@ -6,7 +6,7 @@ import { card, skeleton } from "@/shared/ui/styles";
 import { css } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
-import { truncateAddress, numberWithCommas, formatUsd } from "@/shared/lib/format";
+import { truncateAddress, formatToken, formatUsd, formatPercent } from "@/shared/lib/format";
 import {
   levelStyles,
   getUtilLevel,
@@ -269,7 +269,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               color: levelStyles[utilLevel],
             })}
           >
-            {utilizationPct.toFixed(2)}%
+            {formatPercent(utilizationPct)}
           </span>
         </div>
         <div
@@ -291,7 +291,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {liquidationPrice ? `$${liquidationPrice.toFixed(2)} XTZ` : "none"}
+            {liquidationPrice ? formatUsd(liquidationPrice.toNumber()) : "none"}
           </span>
         </div>
       </div>
@@ -329,7 +329,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {collateralValueUsd ? formatUsd(collateralValueUsd.toNumber()) : "—"} USD
+            {collateralValueUsd ? formatUsd(collateralValueUsd.toNumber()) : "—"}
           </span>
         </div>
         <div
@@ -353,7 +353,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {numberWithCommas(collateralXtz.toFixed(2))} XTZ
+            {formatToken(collateralXtz.toNumber(), "XTZ")}
           </span>
         </div>
         <div
@@ -376,7 +376,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               fontVariantNumeric: "tabular-nums",
             })}
           >
-            {numberWithCommas(debtKusd.toFixed(2))} kUSD
+            {formatToken(debtKusd.toNumber(), "kUSD")}
           </span>
         </div>
       </div>

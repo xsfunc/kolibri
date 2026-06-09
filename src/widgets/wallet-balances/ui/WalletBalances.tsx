@@ -6,6 +6,7 @@ import {
   loadWalletBalancesFx,
 } from "@/entities/wallet";
 import { card, skeleton } from "@/shared/ui/styles";
+import { formatToken } from "@/shared/lib/format";
 import { css, cx } from "styled-system/css";
 import { Wallet } from "lucide-react";
 
@@ -87,7 +88,7 @@ export const WalletBalances = () => {
                 fontWeight: "600",
               })}
             >
-              {kUSD!.toFixed(2)}
+              {formatToken(kUSD!.toNumber(), "kUSD")}
             </span>
           )}
         </div>
@@ -119,7 +120,7 @@ export const WalletBalances = () => {
                 fontWeight: "600",
               })}
             >
-              {xtz != null ? xtz.toFixed(4) : "—"}
+              {xtz != null ? formatToken(xtz.toNumber(), "XTZ", 4) : "—"}
             </span>
           )}
         </div>

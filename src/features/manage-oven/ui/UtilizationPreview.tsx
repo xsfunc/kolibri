@@ -1,5 +1,6 @@
 import { css } from "styled-system/css";
 import { levelStyles, getUtilLevel } from "@/shared/lib/utilization-levels";
+import { formatPercent } from "@/shared/lib/format";
 
 interface UtilizationPreviewProps {
   current: number;
@@ -28,12 +29,12 @@ export const UtilizationPreview = ({ current, projected }: UtilizationPreviewPro
           fontVariantNumeric: "tabular-nums",
         })}
       >
-        <span className={levelStyles[getUtilLevel(current)]}>{current.toFixed(2)}%</span>
+        <span className={levelStyles[getUtilLevel(current)]}>{formatPercent(current)}</span>
         {displayProjected !== null && (
           <>
             {" → "}
             <span className={levelStyles[getUtilLevel(displayProjected)]}>
-              {displayProjected.toFixed(2)}%
+              {formatPercent(displayProjected)}
             </span>
           </>
         )}

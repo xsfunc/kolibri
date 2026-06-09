@@ -1,6 +1,13 @@
 import { useUnit } from "effector-react";
-import { $priceData, $minterData, $globalDataPending } from "@/entities/oven";
+import {
+  $priceData,
+  $minterData,
+  type PriceData,
+  type MinterData,
+  $globalDataPending,
+} from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
+import { formatUsd, formatPercent } from "@/shared/lib/format";
 import { css, cx } from "styled-system/css";
 import { TrendingUp, Shield, Percent } from "lucide-react";
 
@@ -11,8 +18,8 @@ const statCards = [
     iconBg: "rgba(0, 218, 248, 0.15)",
     iconColor: "token(colors.secondary-fixed-dim)",
     label: "XTZ Price",
-    getValue: (priceData: { price: { toFixed: (n: number) => string } } | null) =>
-      priceData ? `$${priceData.price.toFixed(4)}` : "—",
+    getValue: (priceData: PriceData | null) =>
+      priceData ? formatUsd(priceData.price.toNumber(), 4) : "—",
   },
   {
     key: "stability-fee",
@@ -20,10 +27,8 @@ const statCards = [
     iconBg: "rgba(0, 226, 144, 0.15)",
     iconColor: "token(colors.primary-fixed-dim)",
     label: "Stability Fee",
-    getValue: (
-      _: unknown,
-      minterData: { stabilityFee: { toFixed: (n: number) => string } | null },
-    ) => (minterData.stabilityFee != null ? `${minterData.stabilityFee!.toFixed(2)}%` : "—"),
+    getValue: (_: unknown, minterData: MinterData) =>
+      minterData.stabilityFee != null ? formatPercent(minterData.stabilityFee!.toNumber()) : "—",
   },
   {
     key: "collateral-rate",
@@ -31,10 +36,10 @@ const statCards = [
     iconBg: "rgba(228, 196, 81, 0.15)",
     iconColor: "token(colors.tertiary-fixed-dim)",
     label: "Collateral Rate",
-    getValue: (
-      _: unknown,
-      minterData: { collateralRate: { toFixed: (n: number) => string } | null },
-    ) => (minterData.collateralRate != null ? `${minterData.collateralRate!.toFixed(2)}%` : "—"),
+    getValue: (_: unknown, minterData: MinterData) =>
+      minterData.collateralRate != null
+        ? formatPercent(minterData.collateralRate!.toNumber())
+        : "—",
   },
 ] as const;
 

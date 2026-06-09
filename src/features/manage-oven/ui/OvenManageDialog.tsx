@@ -4,7 +4,7 @@ import { DepositPanel } from "./DepositPanel";
 import { WithdrawPanel } from "./WithdrawPanel";
 import { BorrowPanel } from "./BorrowPanel";
 import { RepayPanel } from "./RepayPanel";
-import { numberWithCommas, formatUsd } from "@/shared/lib/format";
+import { formatToken, formatUsd, formatPercent } from "@/shared/lib/format";
 import {
   type Tab,
   $activeTab,
@@ -73,7 +73,7 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {collateralXtz ? `${numberWithCommas(collateralXtz.toFixed(2))} XTZ` : "—"}
+              {collateralXtz ? formatToken(collateralXtz.toNumber(), "XTZ") : "—"}
             </span>
           </div>
           <div
@@ -96,7 +96,7 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {debtKusd ? `${numberWithCommas(debtKusd.toFixed(2))} kUSD` : "0.00 kUSD"}
+              {debtKusd ? formatToken(debtKusd.toNumber(), "kUSD") : formatToken(0, "kUSD")}
             </span>
           </div>
           <div
@@ -119,7 +119,7 @@ export const OvenManageDialog = () => {
                 fontVariantNumeric: "tabular-nums",
               })}
             >
-              {maxDebt ? `${numberWithCommas(maxDebt.toFixed(2))} kUSD` : "—"}
+              {maxDebt ? formatToken(maxDebt.toNumber(), "kUSD") : "—"}
             </span>
           </div>
           <div
@@ -142,7 +142,7 @@ export const OvenManageDialog = () => {
                 color: levelStyles[healthLevel],
               })}
             >
-              {utilizationPct.toFixed(2)}%
+              {formatPercent(utilizationPct)}
             </span>
           </div>
           {collateralValueUsd && (
