@@ -9,9 +9,21 @@ interface DialogProps {
   title?: string;
   description?: string;
   children: ReactNode;
+  className?: string;
+  titleTextStyle?: string;
+  descTextStyle?: string;
 }
 
-export const Dialog = ({ open, onClose, title, description, children }: DialogProps) => (
+export const Dialog = ({
+  open,
+  onClose,
+  title,
+  description,
+  children,
+  className,
+  titleTextStyle = "headline-sm",
+  descTextStyle = "body-sm",
+}: DialogProps) => (
   <BaseDialog.Root
     open={open}
     onOpenChange={(isOpen) => {
@@ -20,11 +32,11 @@ export const Dialog = ({ open, onClose, title, description, children }: DialogPr
   >
     <BaseDialog.Portal>
       <BaseDialog.Backdrop className={dialogBackdrop()} />
-      <BaseDialog.Popup className={dialogPopup()}>
+      <BaseDialog.Popup className={`${dialogPopup()} ${className ?? ""}`}>
         {title && (
           <BaseDialog.Title
             className={css({
-              textStyle: "headline-sm",
+              textStyle: titleTextStyle,
               color: "token(colors.on-surface)",
               margin: "0 0 token(spacing.md)",
             })}
@@ -35,7 +47,7 @@ export const Dialog = ({ open, onClose, title, description, children }: DialogPr
         {description && (
           <BaseDialog.Description
             className={css({
-              textStyle: "body-sm",
+              textStyle: descTextStyle,
               color: "token(colors.on-surface-variant)",
               marginBottom: "token(spacing.md)",
             })}
