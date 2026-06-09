@@ -70,7 +70,19 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                 margin: "0",
               })}
             >
-              {truncateAddress(ovenAddress)}
+              <a
+                href={`https://tzkt.io/${ovenAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={css({
+                  color: "inherit",
+                  textDecoration: "underline",
+                  textUnderlineOffset: "2px",
+                  _hover: { color: "token(colors.primary-fixed-dim)" },
+                })}
+              >
+                {truncateAddress(ovenAddress)}
+              </a>
             </h4>
             <div className={skeleton({ shape: "text" })} style={{ marginTop: "4px" }} />
           </div>
@@ -216,7 +228,19 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               color: textColors[healthLevel],
             })}
           >
-            {truncateAddress(ovenAddress)}
+            <a
+              href={`https://tzkt.io/${ovenAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={css({
+                color: "inherit",
+                textDecoration: "underline",
+                textUnderlineOffset: "2px",
+                _hover: { color: "token(colors.primary-fixed-dim)" },
+              })}
+            >
+              {truncateAddress(ovenAddress)}
+            </a>
           </h4>
           <p
             className={css({
