@@ -6,7 +6,7 @@ import {
   walletDisconnected,
   walletErrored,
   $wallet,
-} from "@/entities/wallet/model/model";
+} from "@/entities/wallet";
 import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos/sdk";
 
 async function createWallet() {

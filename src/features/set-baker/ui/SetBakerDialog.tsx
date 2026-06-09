@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUnit } from "effector-react";
 import { setBakerFx } from "../model/model";
-import { $bakers, $bakersLoading, loadBakersFx } from "@/entities/baker/model/model";
+import { $bakers, $bakersLoading, loadBakersFx } from "@/entities/baker";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Autocomplete } from "@/shared/ui/Autocomplete";
 import { Button } from "@/shared/ui/Button";

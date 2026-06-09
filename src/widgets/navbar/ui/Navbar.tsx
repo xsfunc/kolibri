@@ -1,7 +1,6 @@
 import { useUnit } from "effector-react";
-import { $isConnected } from "@/entities/wallet/model/model";
-import { ConnectButton } from "@/features/connect-wallet/ui/ConnectButton";
-import { WalletInfo } from "@/features/connect-wallet/ui/WalletInfo";
+import { $isConnected } from "@/entities/wallet";
+import { ConnectButton, WalletInfo } from "@/features/connect-wallet";
 import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";

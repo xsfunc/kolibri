@@ -1,12 +1,7 @@
 import { useUnit } from "effector-react";
-import {
-  $ownedOvens,
-  $ovenHealthMap,
-  $priceData,
-  $minterData,
-  type HealthLevel,
-} from "../model/model";
+import { $ownedOvens, $ovenHealthMap, type HealthLevel } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
+import { $ovenCalculations } from "../model/calculations";
 import { card, skeleton } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
@@ -37,16 +32,16 @@ const outlinedVariant: Record<HealthLevel, "outlined" | "outlined-warning" | "ou
 };
 
 export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
-  const { ovens, refreshingAddress, healthMap, priceData, minterData } = useUnit({
+  const { ovens, refreshingAddress, healthMap, calculations } = useUnit({
     ovens: $ownedOvens,
     refreshingAddress: $refreshingOvenAddress,
     healthMap: $ovenHealthMap,
-    priceData: $priceData,
-    minterData: $minterData,
+    calculations: $ovenCalculations,
   });
   const oven = ovens?.[ovenAddress];
   const isRefreshing = refreshingAddress === ovenAddress;
   const health = healthMap[ovenAddress];
+  const calc = calculations[ovenAddress];
 
   if (!oven) {
     return (
@@ -184,27 +179,11 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
 
   const healthLevel: HealthLevel = health?.level ?? "safe";
 
-  const collateralXtz = oven.balance.dividedBy(1e6);
-  const debtKusd = oven.outstandingTokens.dividedBy(1e18);
-  const price = priceData?.price ?? null;
-  const collateralRate = minterData.collateralRate;
-
-  const collateralValueUsd = price ? collateralXtz.multipliedBy(price) : null;
-
-  const maxDebt =
-    collateralValueUsd && collateralRate
-      ? collateralValueUsd.multipliedBy(100).dividedBy(collateralRate)
-      : null;
-
-  const utilizationPct =
-    maxDebt && !debtKusd.isZero() && !maxDebt.isZero()
-      ? Math.min(100, debtKusd.dividedBy(maxDebt).multipliedBy(100).toNumber())
-      : 0;
-
-  const liquidationPrice =
-    !debtKusd.isZero() && !collateralXtz.isZero() && collateralRate
-      ? debtKusd.multipliedBy(collateralRate).dividedBy(collateralXtz)
-      : null;
+  const collateralXtz = calc?.collateralXtz ?? oven.balance.dividedBy(1e6);
+  const debtKusd = calc?.debtKusd ?? oven.outstandingTokens.dividedBy(1e18);
+  const collateralValueUsd = calc?.collateralValueUsd ?? null;
+  const utilizationPct = calc?.utilizationPct ?? 0;
+  const liquidationPrice = calc?.liquidationPrice ?? null;
 
   return (
     <div

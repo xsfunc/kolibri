@@ -1,5 +1,5 @@
 import { createStore, createEvent, combine } from "effector";
-import type BigNumber from "bignumber.js";
+import type { BigNumber } from "@/shared/lib/bignumber";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

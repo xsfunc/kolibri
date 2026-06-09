@@ -1,5 +1,5 @@
 import { createEffect, sample } from "effector";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { tokenClient, tezosToolkit } from "@/shared/api/tezos/sdk";
 import { SHARD, MUTEZ } from "@/shared/config/constants";
 import { balancesUpdated, walletConnected } from "./model";

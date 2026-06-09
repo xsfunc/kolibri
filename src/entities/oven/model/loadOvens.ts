@@ -1,7 +1,7 @@
 import { createEffect, createStore, sample, attach } from "effector";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { SHARD } from "@/shared/config/constants";
-import type { InterestData } from "@/shared/api/tezos/kolibri/types";
+import type { InterestData } from "@/shared/api/tezos/kolibri";
 import {
   ovensLoaded,
   ovenUpdated,
@@ -14,7 +14,7 @@ import {
   type PriceData,
 } from "./model";
 import { stableCoinClient, getOvenClient, NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
-import { $wallet } from "@/entities/wallet/model/model";
+import { $wallet } from "@/entities/wallet/@x/oven";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

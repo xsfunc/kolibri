@@ -1,5 +1,5 @@
 import { useUnit } from "effector-react";
-import { $walletPKH, $isConnected } from "@/entities/wallet/model/model";
+import { $walletPKH, $isConnected } from "@/entities/wallet";
 import { disconnectFx } from "../model/model";
 import { button } from "@/shared/ui/styles";
 import { css } from "../../../../styled-system/css";

@@ -1,6 +1,10 @@
 import { useUnit } from "effector-react";
-import { $walletBalance, $walletBalanceXTZ, $isConnected } from "@/entities/wallet/model/model";
-import { loadWalletBalancesFx } from "@/entities/wallet/model/loadBalances";
+import {
+  $walletBalance,
+  $walletBalanceXTZ,
+  $isConnected,
+  loadWalletBalancesFx,
+} from "@/entities/wallet";
 import { card, skeleton } from "@/shared/ui/styles";
 import { css, cx } from "../../../../styled-system/css";
 import { Wallet } from "lucide-react";

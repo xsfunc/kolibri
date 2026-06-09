@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUnit } from "effector-react";
-import { $rpcNode, rpcNodeChanged } from "@/shared/api/tezos/rpc";
+import { $rpcNode } from "@/shared/api/tezos/rpc";
+import { rpcNodeChanged } from "../model/rpc";
 import { $rpcSettingsOpen, rpcSettingsClosed } from "../model/model";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";

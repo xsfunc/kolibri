@@ -1,6 +1,5 @@
-import { createStore, createEvent, createEffect } from "effector";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
+import { createStore, createEvent } from "effector";
+import { loadBakersFx } from "../api/loadBakers";
 
 export interface BakerInfo {
   address: string;
@@ -9,27 +8,10 @@ export interface BakerInfo {
   numDelegators: number;
 }
 
-// ─── Events ──────────────────────────────────────────────────────────────────
-
 export const bakersLoaded = createEvent<BakerInfo[]>();
 export const bakerSearchChanged = createEvent<string>();
 
-// ─── Effects ─────────────────────────────────────────────────────────────────
-
-export const loadBakersFx = createEffect(async () => {
-  const response = await fetch(
-    "https://api.tzkt.io/v1/delegates?active=true&sort.desc=stakingBalance&limit=100",
-  );
-  const data: BakerInfo[] = await response.json();
-  return data.map((b) => ({
-    address: b.address,
-    alias: b.alias ?? null,
-    stakingBalance: b.stakingBalance ?? 0,
-    numDelegators: b.numDelegators ?? 0,
-  }));
-});
-
-// ─── Stores ──────────────────────────────────────────────────────────────────
+export { loadBakersFx } from "../api/loadBakers";
 
 export const $bakers = createStore<BakerInfo[]>([])
   .on(bakersLoaded, (_, bakers) => bakers)
@@ -39,5 +21,4 @@ export const $bakerSearch = createStore<string>("").on(bakerSearchChanged, (_, q
 
 export const $bakersLoading = loadBakersFx.pending;
 
-/** Filtered bakers based on search query */
-export const $filteredBakers = $bakers.map((bakers) => bakers); // filtered in component via $bakerSearch
+export const $filteredBakers = $bakers.map((bakers) => bakers);

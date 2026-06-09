@@ -9,10 +9,6 @@ export {
   $ovensLoadProgress,
   $ovenAddressesPending,
   $ovenHealthMap,
-  ovensLoaded,
-  ovenUpdated,
-  ovenLoadProgress,
-  ovenAddressesLoading,
   priceDataLoaded,
   minterDataLoaded,
   ovensReset,
@@ -26,3 +22,5 @@ export {
   $globalDataPending,
   $refreshingOvenAddress,
 } from "./model/loadOvens";
+export { $ovenCalculations } from "./model/calculations";
+export type { OvenCalculations } from "./model/calculations";

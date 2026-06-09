@@ -1,9 +1,9 @@
 import { useUnit } from "effector-react";
-import { Stats } from "../../../widgets/stats";
-import { WalletBalances } from "../../../widgets/wallet-balances";
-import { OvenList } from "../../../widgets/oven-list";
-import { ConnectPrompt } from "../../../features/connect-wallet";
-import { $isConnected } from "../../../entities/wallet/model/model";
+import { Stats } from "@/widgets/stats";
+import { WalletBalances } from "@/widgets/wallet-balances";
+import { OvenList } from "@/widgets/oven-list";
+import { ConnectPrompt } from "@/features/connect-wallet";
+import { $isConnected } from "@/entities/wallet";
 import { css } from "../../../../styled-system/css";
 
 export const OvensPage = () => {

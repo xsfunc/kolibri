@@ -1,6 +1,6 @@
 import { createStore, createEvent } from "effector";
 import type { BeaconWallet } from "@taquito/beacon-wallet";
-import type BigNumber from "bignumber.js";
+import type { BigNumber } from "@/shared/lib/bignumber";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

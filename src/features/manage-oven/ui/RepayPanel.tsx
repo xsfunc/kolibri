@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useUnit } from "effector-react";
 import { repayFx } from "../model/model";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { css } from "../../../../styled-system/css";

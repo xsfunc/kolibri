@@ -1,12 +1,10 @@
-import { sample, combine } from "effector";
-import { appStarted } from "@/shared/model/init";
-import { restoreSessionFx } from "@/features/connect-wallet/model/model";
-import { loadGlobalDataFx, loadOvensFx } from "@/entities/oven/model/loadOvens";
-import { walletConnected, walletDisconnected } from "@/entities/wallet/model/model";
-import { ovensReset } from "@/entities/oven/model/model";
-import { rpcNodeChanged } from "@/shared/api/tezos/rpc";
-import { $walletPKH, $isConnected } from "@/entities/wallet/model/model";
-import "@/entities/wallet/model/loadBalances";
+import { sample, combine, createEvent } from "effector";
+import { restoreSessionFx } from "@/features/connect-wallet";
+import { loadGlobalDataFx, loadOvensFx, ovensReset } from "@/entities/oven";
+import { walletConnected, walletDisconnected, $walletPKH, $isConnected } from "@/entities/wallet";
+import { rpcNodeChanged } from "@/features/rpc-settings";
+
+export const appStarted = createEvent();
 
 // ─── On app start ────────────────────────────────────────────────────────────
 

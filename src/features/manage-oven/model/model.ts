@@ -1,8 +1,8 @@
 import { createEffect, createEvent, sample, attach } from "effector";
 import { getOvenClient } from "@/shared/api/tezos/sdk";
-import { $wallet } from "@/entities/wallet/model/model";
-import { refreshOvenFx } from "@/entities/oven/model/loadOvens";
-import BigNumber from "bignumber.js";
+import { $wallet } from "@/entities/wallet";
+import { refreshOvenFx } from "@/entities/oven";
+import { BigNumber } from "@/shared/lib/bignumber";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

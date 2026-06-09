@@ -5,11 +5,11 @@ import {
   $ovensLoading,
   $ovensLoadProgress,
   $ovenAddressesPending,
-} from "@/entities/oven/model/model";
-import { $ovensLoadPending } from "@/entities/oven/model/loadOvens";
-import { $walletPKH } from "@/entities/wallet/model/model";
-import { loadOvensFx } from "@/entities/oven/model/loadOvens";
-import { OvenCard } from "@/entities/oven";
+  loadOvensFx,
+  OvenCard,
+  $ovensLoadPending,
+} from "@/entities/oven";
+import { $walletPKH } from "@/entities/wallet";
 import { Button } from "@/shared/ui/Button";
 import { Progress } from "@/shared/ui/Progress";
 import { css } from "../../../../styled-system/css";
@@ -17,12 +17,12 @@ import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
 
 const OvenManageDialog = lazy(() =>
-  import("@/features/manage-oven/ui/OvenManageDialog").then((m) => ({
+  import("@/features/manage-oven").then((m) => ({
     default: m.OvenManageDialog,
   })),
 );
 const SetBakerDialog = lazy(() =>
-  import("@/features/set-baker/ui/SetBakerDialog").then((m) => ({
+  import("@/features/set-baker").then((m) => ({
     default: m.SetBakerDialog,
   })),
 );

@@ -1,6 +1,5 @@
 import { useUnit } from "effector-react";
-import { $priceData, $minterData } from "@/entities/oven/model/model";
-import { $globalDataPending } from "@/entities/oven/model/loadOvens";
+import { $priceData, $minterData, $globalDataPending } from "@/entities/oven";
 import { card, skeleton } from "@/shared/ui/styles";
 import { css, cx } from "../../../../styled-system/css";
 import { TrendingUp, Shield, Percent } from "lucide-react";
