@@ -1,24 +1,28 @@
 import type { BeaconWallet } from "@taquito/beacon-wallet";
 
 import { TezosToolkit } from "@taquito/taquito";
-import { getRpcNode } from "./rpc";
+import { DEFAULT_RPC } from "@/shared/config/links";
 import {
   CONTRACTS,
   HarbingerClient,
   KusdPriceClient,
+  LiquidityPoolClient,
+  OvenClient,
+  SavingsPoolClient,
   StableCoinClient,
   TokenClient,
-  OvenClient,
   Network,
 } from "./kolibri";
 
-export const tezosToolkit = new TezosToolkit(getRpcNode());
+export const tezosToolkit = new TezosToolkit(DEFAULT_RPC);
 
 const CONTRACTS_MAIN = CONTRACTS.MAIN;
 
 const ovenClientCache = new Map<string, OvenClient>();
 const tokenClient = new TokenClient(tezosToolkit, CONTRACTS_MAIN.TOKEN!);
 const kusdPriceClient = new KusdPriceClient(tezosToolkit, CONTRACTS_MAIN.DEXES.QUIPUSWAP.POOL!);
+const savingsPoolClient = new SavingsPoolClient(tezosToolkit, CONTRACTS_MAIN.SAVINGS_POOL!);
+const liquidityPoolClient = new LiquidityPoolClient(tezosToolkit, CONTRACTS_MAIN.LIQUIDITY_POOL!);
 const harbingerClient = new HarbingerClient(
   tezosToolkit,
   CONTRACTS_MAIN.HARBINGER_NORMALIZER!,
@@ -31,6 +35,10 @@ const stableCoinClient = new StableCoinClient(
   CONTRACTS_MAIN.MINTER!,
   CONTRACTS_MAIN.OVEN_FACTORY!,
 );
+
+export const setRpcNode = (url: string): void => {
+  tezosToolkit.setRpcProvider(url);
+};
 
 export const getOvenClient = (ovenAddress: string): OvenClient => {
   const cached = ovenClientCache.get(ovenAddress);
@@ -45,11 +53,19 @@ export function setWalletProvider(wallet: BeaconWallet): void {
 }
 
 export function clearWalletProvider(): void {
-  tezosToolkit.setWalletProvider(undefined as never);
+  tezosToolkit.setWalletProvider(undefined);
 }
 
 export function clearOvenCache(): void {
   ovenClientCache.clear();
 }
 
-export { stableCoinClient, tokenClient, kusdPriceClient, CONTRACTS_MAIN as NETWORK_CONTRACTS };
+export {
+  tokenClient,
+  kusdPriceClient,
+  stableCoinClient,
+  savingsPoolClient,
+  liquidityPoolClient,
+  DEFAULT_RPC,
+  CONTRACTS_MAIN as NETWORK_CONTRACTS,
+};

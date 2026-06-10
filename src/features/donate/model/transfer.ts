@@ -1,5 +1,5 @@
 import { createEffect, attach } from "effector";
-import { tezosToolkit, NETWORK_CONTRACTS } from "@/shared/api/tezos/sdk";
+import { tezosToolkit, NETWORK_CONTRACTS } from "@/shared/api/tezos";
 import { $wallet, $walletPKH } from "@/entities/wallet";
 import { BigNumber } from "@/shared/lib/bignumber";
 import { MUTEZ, SHARD } from "@/shared/config/constants";

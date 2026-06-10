@@ -1,4 +1,4 @@
-import type { Address } from "./types";
+import type { Address, KolibriOperation } from "./types";
 import { ContractAbstraction, ContractMethodObject, TezosToolkit, Wallet } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
 import {
@@ -6,9 +6,11 @@ import {
   getCompoundingPeriods,
   getTokenBalance,
   interestRateToApy,
+  wrapWalletOperation,
 } from "./utils";
 import { SHARD } from "@/shared/config/constants";
 import type Decimal from "decimal.js";
+import { handleContractError } from "./errors";
 
 const ZERO_MUTEZ = { amount: 0, mutez: true } as const;
 
@@ -21,7 +23,7 @@ export default class SavingsPoolClient {
   private async resolveStorage(cache?: Record<string, unknown>): Promise<Record<string, unknown>> {
     return (
       cache ??
-      ((await (await this.tezos.wallet.at(this.savingsPoolAddress)).storage()) as Record<
+      ((await (await this.tezos.contract.at(this.savingsPoolAddress)).storage()) as Record<
         string,
         unknown
       >)
@@ -31,9 +33,14 @@ export default class SavingsPoolClient {
   public async deposit(
     kUSDAmount: BigNumber,
     savingsPoolContract?: ContractAbstraction<Wallet>,
-  ): Promise<unknown> {
-    const depositTransaction = await this.makeDepositTransaction(kUSDAmount, savingsPoolContract);
-    return await depositTransaction.send(ZERO_MUTEZ);
+  ): Promise<KolibriOperation> {
+    try {
+      const depositTransaction = await this.makeDepositTransaction(kUSDAmount, savingsPoolContract);
+      const op = await depositTransaction.send(ZERO_MUTEZ);
+      return wrapWalletOperation(op);
+    } catch (e: unknown) {
+      handleContractError(e);
+    }
   }
 
   public async makeDepositTransaction(
@@ -48,12 +55,17 @@ export default class SavingsPoolClient {
   public async redeem(
     lpTokenAmount: BigNumber,
     savingsPoolContract?: ContractAbstraction<Wallet>,
-  ): Promise<unknown> {
-    const makeRedeemTransaction = await this.makeRedeemTransaction(
-      lpTokenAmount,
-      savingsPoolContract,
-    );
-    return await makeRedeemTransaction.send(ZERO_MUTEZ);
+  ): Promise<KolibriOperation> {
+    try {
+      const makeRedeemTransaction = await this.makeRedeemTransaction(
+        lpTokenAmount,
+        savingsPoolContract,
+      );
+      const op = await makeRedeemTransaction.send(ZERO_MUTEZ);
+      return wrapWalletOperation(op);
+    } catch (e: unknown) {
+      handleContractError(e);
+    }
   }
 
   public async makeRedeemTransaction(

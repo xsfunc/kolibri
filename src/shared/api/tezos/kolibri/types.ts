@@ -134,3 +134,8 @@ export type KusdPriceData = {
   pegPercent: BigNumber;
   timestamp: number;
 };
+
+export interface KolibriOperation {
+  readonly opHash: string;
+  confirmed(count?: number): Promise<void>;
+}

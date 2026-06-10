@@ -1,7 +1,8 @@
 import { createEffect, createStore, sample, attach, combine } from "effector";
 import { BigNumber } from "@/shared/lib/bignumber";
 import { SHARD } from "@/shared/config/constants";
-import type { InterestData, KusdPriceData } from "@/shared/api/tezos/kolibri";
+import { TZKT_API_URL } from "@/shared/config/links";
+import type { InterestData, KusdPriceData } from "@/shared/api/tezos";
 import {
   ovensLoaded,
   ovenUpdated,
@@ -20,7 +21,7 @@ import {
   getOvenClient,
   kusdPriceClient,
   NETWORK_CONTRACTS,
-} from "@/shared/api/tezos/sdk";
+} from "@/shared/api/tezos";
 import { $wallet } from "@/entities/wallet/@x/oven";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -100,8 +101,6 @@ export const refreshOvenFx = attach({
   },
 });
 
-const TZKT_API = "https://api.tzkt.io/v1";
-
 interface TzktHeadResponse {
   quoteUsd: number;
 }
@@ -114,8 +113,8 @@ interface MinterStorageResponse {
 /** Load global data (XTZ price, minter params) via TzKT API */
 export const loadGlobalDataFx = createEffect(async () => {
   const [headRes, minterRes] = await Promise.all([
-    fetch(`${TZKT_API}/head`),
-    fetch(`${TZKT_API}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
+    fetch(`${TZKT_API_URL}/head`),
+    fetch(`${TZKT_API_URL}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
   ]);
 
   const headData: TzktHeadResponse = await headRes.json();

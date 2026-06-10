@@ -1,7 +1,17 @@
-import { TezosToolkit } from "@taquito/taquito";
+import { TezosToolkit, type WalletOperation } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
 import { SHARD, COMPOUNDS_PER_YEAR, COMPOUND_PERIOD_SECONDS } from "@/shared/config/constants";
 import Decimal from "decimal.js";
+import type { KolibriOperation } from "./types";
+
+export function wrapWalletOperation(op: WalletOperation): KolibriOperation {
+  return {
+    opHash: op.opHash,
+    async confirmed(count = 1) {
+      await op.confirmation(count);
+    },
+  };
+}
 
 export const interestRateToApy = (interestRatePerPeriod: BigNumber): Decimal => {
   const currentValueNoMantissa = new BigNumber(interestRatePerPeriod).dividedBy(SHARD);
@@ -37,7 +47,7 @@ export const getTokenBalance = async (
 ): Promise<BigNumber> => {
   const resolvedTokenStorage =
     tokenContractStorage ??
-    ((await (await tezos.wallet.at(tokenContractAddress)).storage()) as Record<string, unknown>);
+    ((await (await tezos.contract.at(tokenContractAddress)).storage()) as Record<string, unknown>);
   const balances = resolvedTokenStorage.balances as unknown as {
     get: (key: string) => Promise<Record<string, unknown> | undefined>;
   };

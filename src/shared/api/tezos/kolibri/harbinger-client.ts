@@ -17,7 +17,7 @@ export default class HarbingerClient {
       .executeView({ viewCaller: this.ovenProxyAddress });
 
     return {
-      time: new Date(Math.floor(new Date(result.last_update_timestamp).getTime() / 1000)),
+      time: new Date(result.last_update_timestamp),
       price: result.price,
     };
   }

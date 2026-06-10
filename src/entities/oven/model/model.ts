@@ -1,7 +1,7 @@
 import { createStore, createEvent, combine } from "effector";
 import type { BigNumber } from "@/shared/lib/bignumber";
-import type { KusdPriceData } from "@/shared/api/tezos/kolibri";
-export type { KusdPriceData } from "@/shared/api/tezos/kolibri";
+import type { KusdPriceData } from "@/shared/api/tezos";
+export type { KusdPriceData } from "@/shared/api/tezos";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

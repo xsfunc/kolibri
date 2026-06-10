@@ -27,6 +27,7 @@ describe("KusdPriceClient", () => {
       client = new KusdPriceClient(mockTezos, POOL_ADDRESS, "https://api.tzkt.io/v1");
 
       vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
         json: vi.fn().mockResolvedValue({
           storage: {
             tez_pool: "1000000000",
@@ -51,6 +52,7 @@ describe("KusdPriceClient", () => {
       client = new KusdPriceClient(mockTezos, POOL_ADDRESS);
 
       vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
         json: vi.fn().mockResolvedValue({
           storage: {
             tez_pool: "1000000000",
@@ -95,6 +97,7 @@ describe("KusdPriceClient", () => {
 
     it("returns pegPercent ~0 when kUSD is at $1", async () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
         json: vi.fn().mockResolvedValue({
           storage: {
             tez_pool: "1000000000",
@@ -112,6 +115,7 @@ describe("KusdPriceClient", () => {
 
     it("returns negative pegPercent when kUSD is below peg", async () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
         json: vi.fn().mockResolvedValue({
           storage: {
             tez_pool: "1000000000",
@@ -129,6 +133,7 @@ describe("KusdPriceClient", () => {
 
     it("handles large pool values without precision loss", async () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        ok: true,
         json: vi.fn().mockResolvedValue({
           storage: {
             tez_pool: "50000000000000",

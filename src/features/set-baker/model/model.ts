@@ -1,5 +1,5 @@
 import { createEffect, sample, attach } from "effector";
-import { getOvenClient } from "@/shared/api/tezos/sdk";
+import { getOvenClient } from "@/shared/api/tezos";
 import { $wallet } from "@/entities/wallet";
 import { refreshOvenFx } from "@/entities/oven";
 

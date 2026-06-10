@@ -1,13 +1,21 @@
 import { Network } from "./types";
-import type { Address, Shard, Oven, InterestData } from "./types";
+import type { Address, Shard, Oven, InterestData, KolibriOperation } from "./types";
 import { UnitValue } from "@taquito/taquito";
 import type { TezosToolkit } from "@taquito/taquito";
 import BigNumber from "bignumber.js";
-import { compoundingLinearApproximation, getCompoundingPeriods, interestRateToApy } from "./utils";
+import {
+  compoundingLinearApproximation,
+  getCompoundingPeriods,
+  interestRateToApy,
+  wrapWalletOperation,
+} from "./utils";
+import { handleContractError } from "./errors";
 import type Decimal from "decimal.js";
 
 export default class StableCoinClient {
   private minterStorageCache: Record<string, unknown> | null = null;
+  private minterStorageCacheTimestamp = 0;
+  private readonly CACHE_TTL_MS = 60_000;
 
   public constructor(
     private readonly tezos: TezosToolkit,
@@ -23,20 +31,30 @@ export default class StableCoinClient {
     return networkString.charAt(0).toUpperCase() + networkString.slice(1);
   }
 
-  public async deployOven(): Promise<unknown> {
-    const ovenFactoryContract = await this.tezos.wallet.at(this.ovenFactoryAddress);
-    return ovenFactoryContract.methodsObject.makeOven(UnitValue).send();
+  public async deployOven(): Promise<KolibriOperation> {
+    try {
+      const ovenFactoryContract = await this.tezos.wallet.at(this.ovenFactoryAddress);
+      const op = await ovenFactoryContract.methodsObject.makeOven(UnitValue).send();
+      return wrapWalletOperation(op);
+    } catch (e: unknown) {
+      handleContractError(e);
+    }
   }
 
   private async getMinterStorage(): Promise<Record<string, unknown>> {
-    if (this.minterStorageCache) return this.minterStorageCache;
+    const now = Date.now();
+    if (this.minterStorageCache && now - this.minterStorageCacheTimestamp < this.CACHE_TTL_MS) {
+      return this.minterStorageCache;
+    }
     const minterContract = await this.tezos.contract.at(this.minterAddress);
     this.minterStorageCache = (await minterContract.storage()) as Record<string, unknown>;
+    this.minterStorageCacheTimestamp = now;
     return this.minterStorageCache;
   }
 
   public clearCache(): void {
     this.minterStorageCache = null;
+    this.minterStorageCacheTimestamp = 0;
   }
 
   public async getStabilityFeeApy(): Promise<Decimal> {
@@ -93,6 +111,9 @@ export default class StableCoinClient {
       const response = await fetch(
         `https://kolibri-data.s3.amazonaws.com/${this.network}/oven-key-data.json`,
       );
+      if (!response.ok) {
+        throw new Error(`Failed to fetch oven data from S3: ${response.status}`);
+      }
       const data = await response.json();
       return data.ovenData;
     } else {
@@ -106,8 +127,11 @@ export default class StableCoinClient {
 
       while (true) {
         const valuesRes = await fetch(
-          `${this.indexerURL}/v1/bigmap/sandboxnet/${ovenRegistryBigMapId}/keys?size=10&offset=${offset}`,
+          `${this.indexerURL}/v1/bigmap/${this.network}/${ovenRegistryBigMapId}/keys?size=10&offset=${offset}`,
         );
+        if (!valuesRes.ok) {
+          throw new Error(`Failed to fetch oven data from indexer: ${valuesRes.status}`);
+        }
         const valuesData: Array<Record<string, Record<string, Record<string, unknown>>>> =
           await valuesRes.json();
         valuesData.forEach((value) => {

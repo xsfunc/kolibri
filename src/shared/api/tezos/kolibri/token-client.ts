@@ -1,7 +1,8 @@
-import type { Address, Shard } from "./types";
+import type { Address, Shard, KolibriOperation } from "./types";
 import BigNumber from "bignumber.js";
-import { getTokenBalance } from "./utils";
+import { getTokenBalance, wrapWalletOperation } from "./utils";
 import type { TezosToolkit } from "@taquito/taquito";
+import { handleContractError } from "./errors";
 
 export default class TokenClient {
   public constructor(
@@ -9,9 +10,14 @@ export default class TokenClient {
     private readonly tokenAddress: Address,
   ) {}
 
-  public async approveToken(spender: string, amount: BigNumber): Promise<unknown> {
-    const tokenContract = await this.tezos.wallet.at(this.tokenAddress);
-    return tokenContract.methodsObject.approve({ spender, amount }).send();
+  public async approveToken(spender: string, amount: BigNumber): Promise<KolibriOperation> {
+    try {
+      const tokenContract = await this.tezos.wallet.at(this.tokenAddress);
+      const op = await tokenContract.methodsObject.approve({ spender, amount }).send();
+      return wrapWalletOperation(op);
+    } catch (e: unknown) {
+      handleContractError(e);
+    }
   }
 
   public async getBalance(

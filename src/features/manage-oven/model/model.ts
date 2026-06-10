@@ -1,5 +1,5 @@
 import { createEffect, createEvent, createStore, sample, attach, combine } from "effector";
-import { getOvenClient } from "@/shared/api/tezos/sdk";
+import { getOvenClient, type KolibriOperation } from "@/shared/api/tezos";
 import { $wallet, $walletBalanceXTZ, $walletBalance } from "@/entities/wallet";
 import { refreshOvenFx, $ovenCalculations, $ovenHealthMap } from "@/entities/oven";
 import type { HealthLevel } from "@/entities/oven";
@@ -10,6 +10,11 @@ import { BigNumber } from "@/shared/lib/bignumber";
 interface OvenActionParams {
   ovenAddress: string;
   amount: string;
+}
+
+interface OvenActionResult {
+  ovenAddress: string;
+  op: KolibriOperation;
 }
 
 export type Tab = "deposit" | "withdraw" | "borrow" | "repay";
@@ -43,29 +48,37 @@ export const formCleared = createEvent();
 
 // ─── Raw effects ─────────────────────────────────────────────────────────────
 
-const depositRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
-  const client = getOvenClient(ovenAddress);
-  await client.deposit(new BigNumber(amount));
-  return ovenAddress;
-});
+const depositRawFx = createEffect(
+  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
+    const client = getOvenClient(ovenAddress);
+    const op = await client.deposit(new BigNumber(amount));
+    return { ovenAddress, op };
+  },
+);
 
-const withdrawRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
-  const client = getOvenClient(ovenAddress);
-  await client.withdraw(new BigNumber(amount));
-  return ovenAddress;
-});
+const withdrawRawFx = createEffect(
+  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
+    const client = getOvenClient(ovenAddress);
+    const op = await client.withdraw(new BigNumber(amount));
+    return { ovenAddress, op };
+  },
+);
 
-const borrowRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
-  const client = getOvenClient(ovenAddress);
-  await client.borrow(new BigNumber(amount));
-  return ovenAddress;
-});
+const borrowRawFx = createEffect(
+  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
+    const client = getOvenClient(ovenAddress);
+    const op = await client.borrow(new BigNumber(amount));
+    return { ovenAddress, op };
+  },
+);
 
-const repayRawFx = createEffect(async ({ ovenAddress, amount }: OvenActionParams) => {
-  const client = getOvenClient(ovenAddress);
-  await client.repay(new BigNumber(amount));
-  return ovenAddress;
-});
+const repayRawFx = createEffect(
+  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
+    const client = getOvenClient(ovenAddress);
+    const op = await client.repay(new BigNumber(amount));
+    return { ovenAddress, op };
+  },
+);
 
 // ─── Attached effects (guard: wallet must be connected) ──────────────────────
 
@@ -103,6 +116,11 @@ export const repayFx = attach({
     if (!wallet) throw new Error("Wallet not connected");
     return params;
   },
+});
+
+const confirmAndRefreshFx = createEffect(async ({ ovenAddress, op }: OvenActionResult) => {
+  await op.confirmed();
+  return ovenAddress;
 });
 
 // ─── Stores: tab + active oven ───────────────────────────────────────────────
@@ -259,9 +277,11 @@ const allOvenActionsDone = [
   repayFx.doneData,
 ];
 
-sample({ clock: allOvenActionsDone, target: refreshOvenFx });
-sample({ clock: allOvenActionsDone, target: txConfirmed });
+sample({ clock: allOvenActionsDone, fn: ({ op }) => op.opHash, target: txSubmitted });
 sample({ clock: allOvenActionsDone, target: dialogClosed });
+sample({ clock: allOvenActionsDone, target: confirmAndRefreshFx });
+sample({ clock: confirmAndRefreshFx.doneData, target: refreshOvenFx });
+sample({ clock: confirmAndRefreshFx.doneData, target: txConfirmed });
 
 // ─── Wiring: max clicks → set amount ─────────────────────────────────────────
 

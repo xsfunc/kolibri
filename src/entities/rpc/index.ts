@@ -1,1 +1,1 @@
-export { $rpcNode, rpcNodeChanged } from "./model/model";
+export { $rpcNode, rpcNodeChanged } from "./model";

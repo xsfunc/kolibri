@@ -9,7 +9,7 @@ import {
   $wallet,
   $walletState,
 } from "@/entities/wallet";
-import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos/sdk";
+import { setWalletProvider, clearWalletProvider } from "@/shared/api/tezos";
 
 async function createWallet() {
   const { BeaconWallet } = await import("@taquito/beacon-wallet");

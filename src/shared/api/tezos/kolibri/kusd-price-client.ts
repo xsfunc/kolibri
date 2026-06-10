@@ -3,18 +3,22 @@ import type { TezosToolkit } from "@taquito/taquito";
 
 import BigNumber from "bignumber.js";
 import { MUTEZ_TO_SHARD } from "@/shared/config/constants";
+import { TZKT_API_URL } from "@/shared/config/links";
 
 export default class KusdPriceClient {
   public constructor(
     private readonly tezos: TezosToolkit,
     private readonly quipuswapPoolAddress: Address,
-    private readonly tzktApiUrl: string = "https://api.tzkt.io/v1",
+    private readonly tzktApiUrl: string = TZKT_API_URL,
   ) {}
 
   public async getkUSDPriceFromTzKT(xtzUsdPrice: BigNumber): Promise<KusdPriceData> {
     const response = await fetch(
       `${this.tzktApiUrl}/contracts/${this.quipuswapPoolAddress}/storage`,
     );
+    if (!response.ok) {
+      throw new Error(`Failed to fetch kUSD price from TzKT: ${response.status}`);
+    }
     const data: { storage: { tez_pool: string; token_pool: string; last_update_time: string } } =
       await response.json();
 
