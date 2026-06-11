@@ -34,10 +34,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
 
   if (!oven) {
     return (
-      <div
-        className={card()}
-        style={{ borderLeftWidth: "4px", borderLeftColor: "rgba(255,255,255,0.08)" }}
-      >
+      <div className={card({ borderColor: "default" })}>
         <div
           className={css({
             display: "flex",
@@ -79,9 +76,14 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               <span
                 className={cx(
                   skeleton({ shape: "inline" }),
-                  css({ textStyle: "body-sm", fontVariantNumeric: "tabular-nums" }),
+                  css({
+                    textStyle: "body-sm",
+                    fontVariantNumeric: "tabular-nums",
+                    width: "5ch",
+                    display: "inline-block",
+                    verticalAlign: "middle",
+                  }),
                 )}
-                style={{ width: "5ch", display: "inline-block", verticalAlign: "middle" }}
               />
             </p>
           </div>
@@ -102,9 +104,11 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                 textStyle: "body-sm",
                 color: "token(colors.primary-fixed-dim)",
                 fontVariantNumeric: "tabular-nums",
+                width: "8ch",
+                display: "inline-block",
+                verticalAlign: "middle",
               }),
             )}
-            style={{ width: "8ch", display: "inline-block", verticalAlign: "middle" }}
           />
         </p>
 
@@ -135,9 +139,9 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                   textStyle: "body-sm",
                   fontWeight: "700",
                   fontVariantNumeric: "tabular-nums",
+                  width: "5ch",
                 }),
               )}
-              style={{ width: "5ch" }}
             />
           </div>
           <div
@@ -159,22 +163,24 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                   textStyle: "body-sm",
                   fontWeight: "700",
                   fontVariantNumeric: "tabular-nums",
+                  width: "6ch",
                 }),
               )}
-              style={{ width: "6ch" }}
             />
           </div>
         </div>
 
         <div
-          className={cx(skeleton({ shape: "inline" }))}
-          style={{
-            height: "4px",
-            borderRadius: "token(radii.full)",
-            marginBottom: "token(spacing.sm)",
-            width: "100%",
-            display: "block",
-          }}
+          className={cx(
+            skeleton({ shape: "inline" }),
+            css({
+              height: "4px",
+              borderRadius: "token(radii.full)",
+              marginBottom: "token(spacing.sm)",
+              width: "100%",
+              display: "block",
+            }),
+          )}
         />
 
         <div
@@ -206,9 +212,9 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                   textStyle: "body-sm",
                   fontWeight: "700",
                   fontVariantNumeric: "tabular-nums",
+                  width: "7ch",
                 }),
               )}
-              style={{ width: "7ch" }}
             />
           </div>
           <div
@@ -232,9 +238,9 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                   textStyle: "body-sm",
                   fontWeight: "700",
                   fontVariantNumeric: "tabular-nums",
+                  width: "8ch",
                 }),
               )}
-              style={{ width: "8ch" }}
             />
           </div>
           <div
@@ -257,16 +263,21 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                   textStyle: "body-sm",
                   fontWeight: "700",
                   fontVariantNumeric: "tabular-nums",
+                  width: "7ch",
                 }),
               )}
-              style={{ width: "7ch" }}
             />
           </div>
         </div>
 
         <div
-          className={skeleton({ shape: "block" })}
-          style={{ height: "28px", borderRadius: "token(radii.full)" }}
+          className={css({
+            width: "100%",
+            height: "32px",
+            borderRadius: "token(radii.full)",
+            bg: "rgba(255, 255, 255, 0.06)",
+            animation: "skeleton-pulse 1.5s ease-in-out infinite",
+          })}
         />
       </div>
     );
@@ -392,9 +403,11 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                     textStyle: "body-sm",
                     fontWeight: "700",
                     fontVariantNumeric: "tabular-nums",
+                    width: "5ch",
+                    display: "inline-block",
+                    verticalAlign: "middle",
                   }),
                 )}
-                style={{ width: "5ch", display: "inline-block" }}
               />
             )}
           </span>
@@ -430,9 +443,11 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                     textStyle: "body-sm",
                     fontWeight: "700",
                     fontVariantNumeric: "tabular-nums",
+                    width: "6ch",
+                    display: "inline-block",
+                    verticalAlign: "middle",
                   }),
                 )}
-                style={{ width: "6ch", display: "inline-block" }}
               />
             )}
           </span>
@@ -444,13 +459,15 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           <Progress value={utilizationPct} max={100} level={utilLevel} />
         ) : (
           <div
-            className={cx(skeleton({ shape: "inline" }))}
-            style={{
-              height: "4px",
-              borderRadius: "token(radii.full)",
-              width: "100%",
-              display: "block",
-            }}
+            className={cx(
+              skeleton({ shape: "inline" }),
+              css({
+                height: "4px",
+                borderRadius: "token(radii.full)",
+                width: "100%",
+                display: "block",
+              }),
+            )}
           />
         )}
       </div>
@@ -494,9 +511,11 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
                     textStyle: "body-sm",
                     fontWeight: "700",
                     fontVariantNumeric: "tabular-nums",
+                    width: "7ch",
+                    display: "inline-block",
+                    verticalAlign: "middle",
                   }),
                 )}
-                style={{ width: "7ch", display: "inline-block" }}
               />
             )}
           </span>
@@ -565,10 +584,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
 };
 
 export const SkeletonOvenCard = () => (
-  <div
-    className={card()}
-    style={{ borderLeftWidth: "4px", borderLeftColor: "rgba(255,255,255,0.08)" }}
-  >
+  <div className={card({ borderColor: "default" })}>
     <div
       className={css({
         display: "flex",
@@ -581,9 +597,8 @@ export const SkeletonOvenCard = () => (
         <div
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700" }),
+            css({ textStyle: "body-sm", fontWeight: "700", width: "10ch" }),
           )}
-          style={{ width: "10ch" }}
         />
         <p
           className={css({
@@ -597,9 +612,14 @@ export const SkeletonOvenCard = () => (
           <span
             className={cx(
               skeleton({ shape: "inline" }),
-              css({ textStyle: "body-sm", fontVariantNumeric: "tabular-nums" }),
+              css({
+                textStyle: "body-sm",
+                fontVariantNumeric: "tabular-nums",
+                width: "5ch",
+                display: "inline-block",
+                verticalAlign: "middle",
+              }),
             )}
-            style={{ width: "5ch", display: "inline-block", verticalAlign: "middle" }}
           />
         </p>
       </div>
@@ -620,9 +640,11 @@ export const SkeletonOvenCard = () => (
             textStyle: "body-sm",
             color: "token(colors.primary-fixed-dim)",
             fontVariantNumeric: "tabular-nums",
+            width: "8ch",
+            display: "inline-block",
+            verticalAlign: "middle",
           }),
         )}
-        style={{ width: "8ch", display: "inline-block", verticalAlign: "middle" }}
       />
     </p>
 
@@ -647,9 +669,13 @@ export const SkeletonOvenCard = () => (
         <span
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+            css({
+              textStyle: "body-sm",
+              fontWeight: "700",
+              fontVariantNumeric: "tabular-nums",
+              width: "5ch",
+            }),
           )}
-          style={{ width: "5ch" }}
         />
       </div>
       <div
@@ -665,22 +691,28 @@ export const SkeletonOvenCard = () => (
         <span
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+            css({
+              textStyle: "body-sm",
+              fontWeight: "700",
+              fontVariantNumeric: "tabular-nums",
+              width: "6ch",
+            }),
           )}
-          style={{ width: "6ch" }}
         />
       </div>
     </div>
 
     <div
-      className={cx(skeleton({ shape: "inline" }))}
-      style={{
-        height: "4px",
-        borderRadius: "token(radii.full)",
-        marginBottom: "token(spacing.sm)",
-        width: "100%",
-        display: "block",
-      }}
+      className={cx(
+        skeleton({ shape: "inline" }),
+        css({
+          height: "4px",
+          borderRadius: "token(radii.full)",
+          marginBottom: "token(spacing.sm)",
+          width: "100%",
+          display: "block",
+        }),
+      )}
     />
 
     <div
@@ -706,9 +738,13 @@ export const SkeletonOvenCard = () => (
         <span
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+            css({
+              textStyle: "body-sm",
+              fontWeight: "700",
+              fontVariantNumeric: "tabular-nums",
+              width: "7ch",
+            }),
           )}
-          style={{ width: "7ch" }}
         />
       </div>
       <div
@@ -726,9 +762,13 @@ export const SkeletonOvenCard = () => (
         <span
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+            css({
+              textStyle: "body-sm",
+              fontWeight: "700",
+              fontVariantNumeric: "tabular-nums",
+              width: "8ch",
+            }),
           )}
-          style={{ width: "8ch" }}
         />
       </div>
       <div
@@ -745,16 +785,25 @@ export const SkeletonOvenCard = () => (
         <span
           className={cx(
             skeleton({ shape: "inline" }),
-            css({ textStyle: "body-sm", fontWeight: "700", fontVariantNumeric: "tabular-nums" }),
+            css({
+              textStyle: "body-sm",
+              fontWeight: "700",
+              fontVariantNumeric: "tabular-nums",
+              width: "7ch",
+            }),
           )}
-          style={{ width: "7ch" }}
         />
       </div>
     </div>
 
     <div
-      className={skeleton({ shape: "block" })}
-      style={{ height: "28px", borderRadius: "token(radii.full)" }}
+      className={css({
+        width: "100%",
+        height: "32px",
+        borderRadius: "token(radii.full)",
+        bg: "rgba(255, 255, 255, 0.06)",
+        animation: "skeleton-pulse 1.5s ease-in-out infinite",
+      })}
     />
   </div>
 );

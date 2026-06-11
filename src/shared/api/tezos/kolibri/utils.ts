@@ -1,5 +1,5 @@
 import { TezosToolkit, type WalletOperation } from "@taquito/taquito";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { SHARD, COMPOUNDS_PER_YEAR, COMPOUND_PERIOD_SECONDS } from "@/shared/config/constants";
 import Decimal from "decimal.js";
 import type { KolibriOperation } from "./types";

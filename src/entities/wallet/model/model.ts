@@ -47,19 +47,19 @@ export const $walletState = createStore<WalletState>("INITIALIZING")
 
 export const $walletPKH = createStore<string | null>(null)
   .on(walletConnected, (_, { pkh }) => pkh)
-  .on(walletDisconnected, () => null);
+  .reset(walletDisconnected);
 
 export const $wallet = createStore<BeaconWallet | null>(null)
   .on(walletConnected, (_, { wallet }) => wallet)
-  .on(walletDisconnected, () => null);
+  .reset(walletDisconnected);
 
 export const $walletBalance = createStore<BigNumber | null>(null)
   .on(balancesUpdated, (_, { kUSD }) => kUSD)
-  .on(walletDisconnected, () => null);
+  .reset(walletDisconnected);
 
 export const $walletBalanceXTZ = createStore<BigNumber | null>(null)
   .on(balancesUpdated, (_, { xtz }) => xtz)
-  .on(walletDisconnected, () => null);
+  .reset(walletDisconnected);
 
 // ─── Derived ─────────────────────────────────────────────────────────────────
 

@@ -2,7 +2,7 @@ import { Network } from "./types";
 import type { Address, Shard, Oven, InterestData, KolibriOperation } from "./types";
 import { UnitValue } from "@taquito/taquito";
 import type { TezosToolkit } from "@taquito/taquito";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import {
   compoundingLinearApproximation,
   getCompoundingPeriods,

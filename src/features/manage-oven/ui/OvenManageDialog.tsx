@@ -82,7 +82,12 @@ export const OvenManageDialog = () => {
               {collateralXtz ? (
                 formatToken(collateralXtz.toNumber(), "XTZ")
               ) : (
-                <span className={valueSkeleton} style={{ width: "8ch", display: "inline-block" }} />
+                <span
+                  className={cx(
+                    valueSkeleton,
+                    css({ width: "8ch", display: "inline-block", verticalAlign: "middle" }),
+                  )}
+                />
               )}
             </span>
           </div>
@@ -109,7 +114,12 @@ export const OvenManageDialog = () => {
               {debtKusd != null ? (
                 formatToken(debtKusd.toNumber(), "kUSD")
               ) : (
-                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+                <span
+                  className={cx(
+                    valueSkeleton,
+                    css({ width: "7ch", display: "inline-block", verticalAlign: "middle" }),
+                  )}
+                />
               )}
             </span>
           </div>
@@ -136,7 +146,12 @@ export const OvenManageDialog = () => {
               {maxDebt ? (
                 formatToken(maxDebt.toNumber(), "kUSD")
               ) : (
-                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+                <span
+                  className={cx(
+                    valueSkeleton,
+                    css({ width: "7ch", display: "inline-block", verticalAlign: "middle" }),
+                  )}
+                />
               )}
             </span>
           </div>
@@ -163,7 +178,12 @@ export const OvenManageDialog = () => {
               {utilizationPct != null ? (
                 formatPercent(utilizationPct)
               ) : (
-                <span className={valueSkeleton} style={{ width: "5ch", display: "inline-block" }} />
+                <span
+                  className={cx(
+                    valueSkeleton,
+                    css({ width: "5ch", display: "inline-block", verticalAlign: "middle" }),
+                  )}
+                />
               )}
             </span>
           </div>
@@ -192,7 +212,12 @@ export const OvenManageDialog = () => {
               {collateralValueUsd ? (
                 formatUsd(collateralValueUsd.toNumber())
               ) : (
-                <span className={valueSkeleton} style={{ width: "7ch", display: "inline-block" }} />
+                <span
+                  className={cx(
+                    valueSkeleton,
+                    css({ width: "7ch", display: "inline-block", verticalAlign: "middle" }),
+                  )}
+                />
               )}
             </span>
           </div>

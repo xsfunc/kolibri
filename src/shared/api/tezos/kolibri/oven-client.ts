@@ -3,7 +3,7 @@ import { UnitValue } from "@taquito/taquito";
 import type { TezosToolkit } from "@taquito/taquito";
 import type HarbingerClient from "./harbinger-client";
 import type StableCoinClient from "./stable-coin-client";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { SHARD, MUTEZ_TO_SHARD } from "@/shared/config/constants";
 import { handleContractError } from "./errors";
 import { wrapWalletOperation } from "./utils";

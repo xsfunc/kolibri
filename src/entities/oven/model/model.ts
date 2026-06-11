@@ -60,7 +60,7 @@ export const $ownedOvens = createStore<Record<string, OvenData | null> | null>(n
   .on(ovenUpdated, (state, { address, data }) =>
     state ? { ...state, [address]: data } : { [address]: data },
   )
-  .on(ovensReset, () => null);
+  .reset(ovensReset);
 
 export const $priceData = createStore<PriceData | null>(null).on(
   priceDataLoaded,
@@ -81,8 +81,7 @@ export const $kusdPriceData = createStore<KusdPriceData | null>(null).on(
 
 export const $ovensLoadProgress = createStore<{ loaded: number; total: number } | null>(null)
   .on(ovenLoadProgress, (_, p) => p)
-  .on(ovensLoaded, () => null)
-  .on(ovensReset, () => null);
+  .reset([ovensLoaded, ovensReset]);
 
 export const $ovenAddressesPending = createStore<string[]>([])
   .on(ovenAddressesLoading, (_, addrs) => addrs)

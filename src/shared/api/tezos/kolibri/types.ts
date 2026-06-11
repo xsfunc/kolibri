@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 
 export type Address = string;
 export type Mutez = BigNumber;

@@ -169,9 +169,7 @@ export const $globalDataPending = loadGlobalDataFx.pending;
 
 export const $refreshingOvenAddress = createStore<string | null>(null)
   .on(refreshOvenFx, (_, ovenAddress) => ovenAddress)
-  .on(refreshOvenFx.done, () => null)
-  .on(refreshOvenFx.fail, () => null)
-  .on(ovensReset, () => null);
+  .reset([refreshOvenFx.done, refreshOvenFx.fail, ovensReset]);
 
 sample({
   clock: loadOvensFx.fail,

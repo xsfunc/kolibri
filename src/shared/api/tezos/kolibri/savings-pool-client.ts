@@ -1,6 +1,6 @@
 import type { Address, KolibriOperation } from "./types";
 import { ContractAbstraction, ContractMethodObject, TezosToolkit, Wallet } from "@taquito/taquito";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import {
   compoundingLinearApproximation,
   getCompoundingPeriods,

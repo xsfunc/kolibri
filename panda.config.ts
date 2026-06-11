@@ -105,6 +105,7 @@ export default defineConfig({
       },
       semanticTokens: {
         colors: {
+          "donate-pink": { value: "#e84393" },
           collateral: {
             safe: { value: "{colors.primary-container}" },
             warning: { value: "{colors.tertiary-container}" },
@@ -193,6 +194,11 @@ export default defineConfig({
   },
 
   outdir: "styled-system",
+  staticCss: {
+    recipes: {
+      card: [{ borderColor: ["default"] }],
+    },
+  },
   globalCss: {
     ":root": {
       "--global-font-body": "var(--fonts-sans)",

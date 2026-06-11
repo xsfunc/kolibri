@@ -1,5 +1,5 @@
 import type { Address, Shard, KolibriOperation } from "./types";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { getTokenBalance, wrapWalletOperation } from "./utils";
 import type { TezosToolkit } from "@taquito/taquito";
 import { handleContractError } from "./errors";

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import KusdPriceClient from "./kusd-price-client";
 
 const POOL_ADDRESS = "KT1K4EwTpbvYN9agJdjpyJm4ZZdhpUNKB3F6";

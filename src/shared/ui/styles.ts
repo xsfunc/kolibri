@@ -112,9 +112,13 @@ export const card = cva({
       },
       false: {},
     },
+    borderColor: {
+      default: { borderLeftWidth: "4px", borderLeftColor: "rgba(255,255,255,0.08)" },
+    },
   },
   defaultVariants: {
     interactive: false,
+    borderColor: "default",
   },
 });
 

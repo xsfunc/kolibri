@@ -84,9 +84,9 @@ export const WalletBalances = () => {
                   fontWeight: "600",
                   fontVariantNumeric: "tabular-nums",
                   height: "24px",
+                  width: "10ch",
                 }),
               )}
-              style={{ width: "10ch" }}
             />
           ) : (
             <span
@@ -127,9 +127,9 @@ export const WalletBalances = () => {
                   fontWeight: "600",
                   fontVariantNumeric: "tabular-nums",
                   height: "24px",
+                  width: "10ch",
                 }),
               )}
-              style={{ width: "10ch" }}
             />
           ) : (
             <span

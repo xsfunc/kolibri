@@ -1,7 +1,7 @@
 import type { Address, KusdPriceData } from "./types";
 import type { TezosToolkit } from "@taquito/taquito";
 
-import BigNumber from "bignumber.js";
+import { BigNumber } from "@/shared/lib/bignumber";
 import { MUTEZ_TO_SHARD } from "@/shared/config/constants";
 import { TZKT_API_URL } from "@/shared/config/links";
 

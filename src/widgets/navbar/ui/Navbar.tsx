@@ -5,7 +5,7 @@ import { rpcSettingsOpened } from "@/features/rpc-settings";
 import { donateOpened } from "@/features/donate";
 import { REPO_URL, TWITTER_URL } from "@/shared/config/links";
 import { button } from "@/shared/ui/styles";
-import { css } from "styled-system/css";
+import { css, cx } from "styled-system/css";
 import { CodeXml, Settings, Heart } from "lucide-react";
 
 export const Navbar = () => {
@@ -79,7 +79,6 @@ export const Navbar = () => {
           aria-label="GitHub repository"
           title="Github Repository"
           className={button({ variant: "icon", size: "sm" })}
-          style={{ color: "var(--colors-on-surface-variant)" }}
         >
           <CodeXml size={16} />
         </a>
@@ -87,8 +86,10 @@ export const Navbar = () => {
           onClick={() => donateOpened()}
           aria-label="Donate"
           title="Donate"
-          className={button({ variant: "icon", size: "sm" })}
-          style={{ color: "#e84393" }}
+          className={cx(
+            button({ variant: "icon", size: "sm" }),
+            css({ color: "token(colors.donate-pink)" }),
+          )}
         >
           <Heart size={16} />
         </button>
