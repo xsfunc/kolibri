@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { useUnit } from "effector-react";
 import {
   $ovenList,
@@ -16,6 +16,7 @@ import { css } from "styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
 import { dialogOpened, $dialogOpen, type Tab } from "@/features/manage-oven";
+import { bakerSetConfirmed } from "@/features/set-baker";
 
 const OvenManageDialog = lazy(() =>
   import("@/features/manage-oven").then((m) => ({
@@ -44,6 +45,11 @@ export const OvenList = () => {
 
   const openDialog = useUnit(dialogOpened);
   const [bakerOven, setBakerOven] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = bakerSetConfirmed.watch(() => setBakerOven(null));
+    return unsub;
+  }, []);
 
   const handleAction = (ovenAddress: string, action: string) => {
     if (action === "baker") {

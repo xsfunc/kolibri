@@ -96,12 +96,13 @@ sample({
   target: sessionCheckDone,
 });
 
+const clearProviderFx = createEffect(() => {
+  clearWalletProvider();
+});
+
 sample({
   clock: disconnectFx.done,
-  fn: () => {
-    clearWalletProvider();
-  },
-  target: [],
+  target: clearProviderFx,
 });
 
 sample({
@@ -112,13 +113,13 @@ sample({
 // ─── Timeout: fallback if restoreSessionFx hangs ────────────────────────────
 
 const sessionTimeoutTick = createEvent();
+const sessionTimeoutFx = createEffect(() => {
+  setTimeout(() => sessionTimeoutTick(), 5000);
+});
 
 sample({
   clock: restoreSessionFx,
-  target: createEffect(() => {
-    const timer = setTimeout(() => sessionTimeoutTick(), 5000);
-    return () => clearTimeout(timer);
-  }),
+  target: sessionTimeoutFx,
 });
 
 sample({

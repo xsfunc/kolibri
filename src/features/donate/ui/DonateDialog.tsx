@@ -1,14 +1,17 @@
-import { useState, useCallback } from "react";
 import { useUnit } from "effector-react";
-import { $donateOpen, donateClosed } from "../model/model";
 import {
-  donateXtzFx,
-  donateKusdFx,
-  donateUsdtFx,
-  DONATE_ADDRESS,
-  CURRENCIES,
-  type Currency,
-} from "../model/transfer";
+  $donateOpen,
+  donateClosed,
+  $amount,
+  $currency,
+  $txStatus,
+  $txError,
+  $donatePending,
+  amountChanged,
+  currencyChanged,
+  donateSubmitted,
+} from "../model/model";
+import { DONATE_ADDRESS, CURRENCIES } from "../model/transfer";
 import { $isConnected, $isInitializing } from "@/entities/wallet";
 import { connectWalletFx } from "@/features/connect-wallet";
 import { Dialog } from "@/shared/ui/Dialog";
@@ -16,82 +19,26 @@ import { Button } from "@/shared/ui/Button";
 import { Copy } from "lucide-react";
 import { css } from "styled-system/css";
 
-type TxStatus = "idle" | "pending" | "success" | "error";
+export type { TxStatus } from "../model/model";
 
 export const DonateDialog = () => {
-  const [amount, setAmount] = useState("10");
-  const [currency, setCurrency] = useState<Currency>("XTZ");
-  const [txStatus, setTxStatus] = useState<TxStatus>("idle");
-  const [txError, setTxError] = useState("");
-
-  const open = useUnit($donateOpen);
-  const close = useUnit(donateClosed);
-  const isConnected = useUnit($isConnected);
-  const isInitializing = useUnit($isInitializing);
-
-  const xtzPending = useUnit(donateXtzFx.pending);
-  const kusdPending = useUnit(donateKusdFx.pending);
-  const usdtPending = useUnit(donateUsdtFx.pending);
-  const pending = xtzPending || kusdPending || usdtPending;
-
-  const handleCurrencyChange = useCallback((c: Currency) => {
-    setCurrency(c);
-    setTxStatus("idle");
-    setTxError("");
-  }, []);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(DONATE_ADDRESS);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const handleConnect = useCallback(() => {
-    void connectWalletFx();
-  }, []);
-
-  const handleDonate = useCallback(async () => {
-    if (!amount || Number(amount) <= 0) {
-      setTxError("Amount must be greater than 0");
-      return;
-    }
-
-    setTxStatus("pending");
-    setTxError("");
-
-    try {
-      switch (currency) {
-        case "XTZ":
-          await donateXtzFx({ amount });
-          break;
-        case "kUSD":
-          await donateKusdFx({ amount });
-          break;
-        case "USDT":
-          await donateUsdtFx({ amount });
-          break;
-      }
-      setTxStatus("success");
-    } catch (err) {
-      setTxStatus("error");
-      setTxError(err instanceof Error ? err.message : "Transaction failed");
-    }
-  }, [amount, currency]);
-
-  const handleClose = useCallback(() => {
-    setTxStatus("idle");
-    setTxError("");
-    setAmount("10");
-    setCurrency("XTZ");
-    close();
-  }, [close]);
+  const { open, close, isConnected, isInitializing, amount, currency, txStatus, txError, pending } =
+    useUnit({
+      open: $donateOpen,
+      close: donateClosed,
+      isConnected: $isConnected,
+      isInitializing: $isInitializing,
+      amount: $amount,
+      currency: $currency,
+      txStatus: $txStatus,
+      txError: $txError,
+      pending: $donatePending,
+    });
 
   const canDonate = amount && Number(amount) > 0 && !pending && isConnected;
 
   return (
-    <Dialog open={open} onClose={handleClose} title="Donate">
+    <Dialog open={open} onClose={close} title="Donate">
       <div className={css({ display: "flex", flexDirection: "column", gap: "token(spacing.sm)" })}>
         <div
           className={css({
@@ -124,7 +71,9 @@ export const DonateDialog = () => {
               {DONATE_ADDRESS}
             </code>
             <button
-              onClick={handleCopy}
+              onClick={() => {
+                void navigator.clipboard.writeText(DONATE_ADDRESS).catch(() => {});
+              }}
               className={css({
                 bg: "transparent",
                 border: "none",
@@ -174,11 +123,7 @@ export const DonateDialog = () => {
               min="0"
               step="0.1"
               value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
-                setTxStatus("idle");
-                setTxError("");
-              }}
+              onChange={(e) => amountChanged(e.target.value)}
               placeholder="0"
               disabled={txStatus === "pending"}
               className={css({
@@ -208,7 +153,7 @@ export const DonateDialog = () => {
               {CURRENCIES.map((c) => (
                 <button
                   key={c}
-                  onClick={() => handleCurrencyChange(c)}
+                  onClick={() => currencyChanged(c)}
                   className={css({
                     padding: "3px 8px",
                     borderRadius: "token(radii.full)",
@@ -286,14 +231,19 @@ export const DonateDialog = () => {
 
         {!isConnected ? (
           <Button
-            onClick={handleConnect}
+            onClick={() => void connectWalletFx()}
             disabled={isInitializing || txStatus === "pending"}
             variant="primary"
           >
             {isInitializing ? "…" : "Connect Wallet"}
           </Button>
         ) : (
-          <Button onClick={handleDonate} disabled={!canDonate} loading={pending} variant="primary">
+          <Button
+            onClick={() => donateSubmitted()}
+            disabled={!canDonate}
+            loading={pending}
+            variant="primary"
+          >
             Donate
           </Button>
         )}

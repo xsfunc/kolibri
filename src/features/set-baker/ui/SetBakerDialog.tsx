@@ -30,9 +30,8 @@ export const SetBakerDialog = ({ ovenAddress, open, onClose }: SetBakerDialogPro
     }
   }, [open, bakers.length, loadBakers]);
 
-  const handleConfirm = async () => {
-    await setBaker({ ovenAddress, baker: selected });
-    onClose();
+  const handleConfirm = () => {
+    void setBaker({ ovenAddress, baker: selected });
   };
 
   const options = [

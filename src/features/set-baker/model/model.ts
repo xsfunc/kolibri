@@ -1,4 +1,4 @@
-import { createEffect, sample, attach } from "effector";
+import { createEvent, createEffect, sample, attach } from "effector";
 import { getOvenClient } from "@/shared/api/tezos";
 import { $wallet } from "@/entities/wallet";
 import { refreshOvenFx } from "@/entities/oven";
@@ -31,7 +31,9 @@ export const setBakerFx = attach({
 
 // ─── Wiring: after setting baker → refresh oven ──────────────────────────────
 
+export const bakerSetConfirmed = createEvent<string>();
+
 sample({
   clock: setBakerFx.doneData,
-  target: refreshOvenFx,
+  target: [refreshOvenFx, bakerSetConfirmed],
 });
