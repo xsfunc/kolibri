@@ -17,7 +17,7 @@ export const OvensPage = () => {
         paddingBottom: "token(spacing.xl)",
         paddingLeft: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
         paddingRight: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
-        maxWidth: "1200px",
+        maxWidth: "token(sizes.content-max)",
         width: "100%",
         margin: "0 auto",
       })}

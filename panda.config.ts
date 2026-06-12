@@ -91,6 +91,9 @@ export default defineConfig({
           "margin-desktop": { value: "40px" },
           gutter: { value: "16px" },
         },
+        sizes: {
+          "content-max": { value: "1200px" },
+        },
         shadows: {
           "card-glow": {
             value: "0 0 24px rgba(0, 255, 163, 0.12), 0 4px 16px rgba(0, 0, 0, 0.3)",

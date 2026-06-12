@@ -21,94 +21,108 @@ export const Navbar = () => {
         bg: "rgba(18, 20, 20, 0.6)",
         backdropFilter: "blur(24px)",
         borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        height: "64px",
-        paddingLeft: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
-        paddingRight: { base: "token(spacing.margin-mobile)", md: "token(spacing.margin-desktop)" },
       })}
     >
       <div
         className={css({
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: "0",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: "64px",
+          maxWidth: "token(sizes.content-max)",
+          width: "100%",
+          margin: "0 auto",
+          paddingLeft: {
+            base: "token(spacing.margin-mobile)",
+            md: "token(spacing.margin-desktop)",
+          },
+          paddingRight: {
+            base: "token(spacing.margin-mobile)",
+            md: "token(spacing.margin-desktop)",
+          },
         })}
       >
-        <span
+        <div
           className={css({
-            fontSize: "16px",
-            lineHeight: "1.2",
-            color: "token(colors.primary-fixed-dim)",
-            fontWeight: "800",
-            letterSpacing: "-0.04em",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: "0",
           })}
         >
-          Kolibri
-        </span>
-        <span
-          className={css({
-            fontSize: "11px",
-            lineHeight: "1.2",
-            color: "token(colors.on-surface-variant)",
-          })}
-        >
-          Dashboard by{" "}
-          <a
-            href={TWITTER_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <span
             className={css({
-              color: "token(colors.on-surface-variant)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-              _hover: { color: "token(colors.primary-fixed-dim)" },
+              fontSize: "16px",
+              lineHeight: "1.2",
+              color: "token(colors.primary-fixed-dim)",
+              fontWeight: "800",
+              letterSpacing: "-0.04em",
             })}
           >
-            xsfunc
+            Kolibri
+          </span>
+          <span
+            className={css({
+              fontSize: "11px",
+              lineHeight: "1.2",
+              color: "token(colors.on-surface-variant)",
+            })}
+          >
+            Dashboard by{" "}
+            <a
+              href={TWITTER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={css({
+                color: "token(colors.on-surface-variant)",
+                textDecoration: "underline",
+                textUnderlineOffset: "2px",
+                _hover: { color: "token(colors.primary-fixed-dim)" },
+              })}
+            >
+              xsfunc
+            </a>
+          </span>
+        </div>
+        <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub repository"
+            title="Github Repository"
+            className={button({ variant: "icon", size: "sm" })}
+          >
+            <CodeXml size={16} />
           </a>
-        </span>
-      </div>
-      <div className={css({ display: "flex", alignItems: "center", gap: "token(spacing.sm)" })}>
-        <a
-          href={REPO_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub repository"
-          title="Github Repository"
-          className={button({ variant: "icon", size: "sm" })}
-        >
-          <CodeXml size={16} />
-        </a>
-        <button
-          onClick={() => donateOpened()}
-          aria-label="Donate"
-          title="Donate"
-          className={cx(
-            button({ variant: "icon", size: "sm" }),
-            css({ color: "token(colors.donate-pink)" }),
-          )}
-        >
-          <Heart size={16} />
-        </button>
-        {walletState === "INITIALIZING" ? (
-          <button disabled className={button({ variant: "primary", size: "sm" })}>
-            …
+          <button
+            onClick={() => donateOpened()}
+            aria-label="Donate"
+            title="Donate"
+            className={cx(
+              button({ variant: "icon", size: "sm" }),
+              css({ color: "token(colors.donate-pink)" }),
+            )}
+          >
+            <Heart size={16} />
           </button>
-        ) : walletState === "CONNECTED" ? (
-          <WalletInfo />
-        ) : (
-          <ConnectButton />
-        )}
-        <button
-          onClick={() => rpcSettingsOpened()}
-          aria-label="RPC settings"
-          className={button({ variant: "icon", size: "sm" })}
-        >
-          <Settings size={16} />
-        </button>
+          {walletState === "INITIALIZING" ? (
+            <button disabled className={button({ variant: "primary", size: "sm" })}>
+              …
+            </button>
+          ) : walletState === "CONNECTED" ? (
+            <WalletInfo />
+          ) : (
+            <ConnectButton />
+          )}
+          <button
+            onClick={() => rpcSettingsOpened()}
+            aria-label="RPC settings"
+            className={button({ variant: "icon", size: "sm" })}
+          >
+            <Settings size={16} />
+          </button>
+        </div>
       </div>
     </header>
   );
