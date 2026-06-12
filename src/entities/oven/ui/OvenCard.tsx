@@ -16,9 +16,11 @@ import {
   levelOutlinedVariant,
 } from "@/shared/lib/utilization-levels";
 
+type OvenCardAction = "deposit" | "withdraw" | "borrow" | "repay" | "baker";
+
 interface OvenCardProps {
   ovenAddress: string;
-  onAction: (action: string) => void;
+  onAction: (action: OvenCardAction) => void;
 }
 
 export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {

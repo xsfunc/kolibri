@@ -1,4 +1,14 @@
-import { createEffect, createEvent, createStore, sample, attach, combine } from "effector";
+import {
+  createEffect,
+  createEvent,
+  createStore,
+  sample,
+  attach,
+  combine,
+  type EventCallable,
+  type Store,
+  type StoreWritable,
+} from "effector";
 import { getOvenClient, type KolibriOperation } from "@/shared/api/tezos";
 import { $wallet, $walletBalanceXTZ, $walletBalance } from "@/entities/wallet";
 import { refreshOvenFx, $ovenCalculations, $ovenHealthMap } from "@/entities/oven";
@@ -54,77 +64,83 @@ export const repaySubmitted = createEvent();
 
 export const formCleared = createEvent();
 
-// ─── Raw effects ─────────────────────────────────────────────────────────────
+// ─── Effect factory ─────────────────────────────────────────────────────────
 
-const depositRawFx = createEffect(
-  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
-    const client = getOvenClient(ovenAddress);
-    const op = await client.deposit(new BigNumber(amount));
-    return { ovenAddress, op };
-  },
-);
+type OvenActionMethod = "deposit" | "withdraw" | "borrow" | "repay";
 
-const withdrawRawFx = createEffect(
-  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
-    const client = getOvenClient(ovenAddress);
-    const op = await client.withdraw(new BigNumber(amount));
-    return { ovenAddress, op };
-  },
-);
+interface CreateOvenActionConfig {
+  method: OvenActionMethod;
+  amount: Store<string>;
+  amountChanged: EventCallable<string>;
+  submitted: EventCallable<void>;
+  maxClicked: EventCallable<void>;
+  max: Store<BigNumber | null>;
+  maxPrecision: number;
+  error: StoreWritable<string>;
+  toRaw: (amount: string) => BigNumber;
+  errorMsg: string;
+}
 
-const borrowRawFx = createEffect(
-  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
-    const client = getOvenClient(ovenAddress);
-    const op = await client.borrow(new BigNumber(amount));
-    return { ovenAddress, op };
-  },
-);
+function createOvenAction({
+  method,
+  amount,
+  amountChanged,
+  submitted,
+  maxClicked,
+  max,
+  maxPrecision,
+  error,
+  toRaw,
+  errorMsg,
+}: CreateOvenActionConfig) {
+  const rawFx = createEffect(
+    async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
+      const client = getOvenClient(ovenAddress);
+      const op = await client[method](new BigNumber(amount));
+      return { ovenAddress, op };
+    },
+  );
 
-const repayRawFx = createEffect(
-  async ({ ovenAddress, amount }: OvenActionParams): Promise<OvenActionResult> => {
-    const client = getOvenClient(ovenAddress);
-    const op = await client.repay(new BigNumber(amount));
-    return { ovenAddress, op };
-  },
-);
+  const fx = attach({
+    source: $wallet,
+    effect: rawFx,
+    mapParams: (params: OvenActionParams, wallet) => {
+      if (!wallet) throw new Error("Wallet not connected");
+      return params;
+    },
+  });
 
-// ─── Attached effects (guard: wallet must be connected) ──────────────────────
+  sample({
+    clock: maxClicked,
+    source: max,
+    filter: (max) => max !== null,
+    fn: (max) => max!.toFixed(maxPrecision),
+    target: amountChanged,
+  });
 
-export const depositFx = attach({
-  source: $wallet,
-  effect: depositRawFx,
-  mapParams: (params: OvenActionParams, wallet) => {
-    if (!wallet) throw new Error("Wallet not connected");
-    return params;
-  },
-});
+  sample({
+    clock: submitted,
+    source: { amount, ovenAddress: $activeOvenAddress },
+    filter: ({ amount }) => amount !== "" && Number(amount) > 0,
+    fn: ({ amount, ovenAddress }) => ({
+      ovenAddress,
+      amount: toRaw(amount).toString(),
+    }),
+    target: fx,
+  });
 
-export const withdrawFx = attach({
-  source: $wallet,
-  effect: withdrawRawFx,
-  mapParams: (params: OvenActionParams, wallet) => {
-    if (!wallet) throw new Error("Wallet not connected");
-    return params;
-  },
-});
+  sample({
+    clock: submitted,
+    source: amount,
+    filter: (amount) => amount === "" || Number(amount) <= 0,
+    fn: () => "Amount must be greater than 0",
+    target: error,
+  });
 
-export const borrowFx = attach({
-  source: $wallet,
-  effect: borrowRawFx,
-  mapParams: (params: OvenActionParams, wallet) => {
-    if (!wallet) throw new Error("Wallet not connected");
-    return params;
-  },
-});
+  sample({ clock: fx.fail, fn: () => errorMsg, target: error });
 
-export const repayFx = attach({
-  source: $wallet,
-  effect: repayRawFx,
-  mapParams: (params: OvenActionParams, wallet) => {
-    if (!wallet) throw new Error("Wallet not connected");
-    return params;
-  },
-});
+  return fx;
+}
 
 const confirmAndRefreshFx = createEffect(async ({ ovenAddress, op }: OvenActionResult) => {
   await op.confirmed();
@@ -251,6 +267,60 @@ export const $repayProjectedUtil = combine($repayAmount, $activeOvenCalc, (amoun
   return input ? projectRepayUtil(input) : null;
 });
 
+// ─── Oven actions ───────────────────────────────────────────────────────────
+
+export const depositFx = createOvenAction({
+  method: "deposit",
+  amount: $depositAmount,
+  amountChanged: depositAmountChanged,
+  submitted: depositSubmitted,
+  maxClicked: depositMaxClicked,
+  max: $depositMax,
+  maxPrecision: 6,
+  error: $depositError,
+  toRaw: xtzToMutez,
+  errorMsg: "Deposit failed",
+});
+
+export const withdrawFx = createOvenAction({
+  method: "withdraw",
+  amount: $withdrawAmount,
+  amountChanged: withdrawAmountChanged,
+  submitted: withdrawSubmitted,
+  maxClicked: withdrawMaxClicked,
+  max: $withdrawMax,
+  maxPrecision: 6,
+  error: $withdrawError,
+  toRaw: xtzToMutez,
+  errorMsg: "Withdrawal failed",
+});
+
+export const borrowFx = createOvenAction({
+  method: "borrow",
+  amount: $borrowAmount,
+  amountChanged: borrowAmountChanged,
+  submitted: borrowSubmitted,
+  maxClicked: borrowMaxClicked,
+  max: $borrowMax,
+  maxPrecision: 2,
+  error: $borrowError,
+  toRaw: kusdToShard,
+  errorMsg: "Borrow failed",
+});
+
+export const repayFx = createOvenAction({
+  method: "repay",
+  amount: $repayAmount,
+  amountChanged: repayAmountChanged,
+  submitted: repaySubmitted,
+  maxClicked: repayMaxClicked,
+  max: $repayMax,
+  maxPrecision: 2,
+  error: $repayError,
+  toRaw: kusdToShard,
+  errorMsg: "Repay failed",
+});
+
 // ─── Derived: pending states ─────────────────────────────────────────────────
 
 export const $depositPending = depositFx.pending;
@@ -272,129 +342,3 @@ sample({ clock: allOvenActionsDone, target: dialogClosed });
 sample({ clock: allOvenActionsDone, target: confirmAndRefreshFx });
 sample({ clock: confirmAndRefreshFx.doneData, target: refreshOvenFx });
 sample({ clock: confirmAndRefreshFx.doneData, target: txConfirmed });
-
-// ─── Wiring: max clicks → set amount ─────────────────────────────────────────
-
-sample({
-  clock: depositMaxClicked,
-  source: $depositMax,
-  filter: (max) => max !== null,
-  fn: (max) => max!.toFixed(6),
-  target: depositAmountChanged,
-});
-
-sample({
-  clock: withdrawMaxClicked,
-  source: $withdrawMax,
-  filter: (max) => max !== null,
-  fn: (max) => max!.toFixed(6),
-  target: withdrawAmountChanged,
-});
-
-sample({
-  clock: borrowMaxClicked,
-  source: $borrowMax,
-  filter: (max) => max !== null,
-  fn: (max) => max!.toFixed(2),
-  target: borrowAmountChanged,
-});
-
-sample({
-  clock: repayMaxClicked,
-  source: $repayMax,
-  filter: (max) => max !== null,
-  fn: (max) => max!.toFixed(2),
-  target: repayAmountChanged,
-});
-
-// ─── Wiring: deposit submit ──────────────────────────────────────────────────
-
-sample({
-  clock: depositSubmitted,
-  source: { amount: $depositAmount, ovenAddress: $activeOvenAddress },
-  filter: ({ amount }) => amount !== "" && Number(amount) > 0,
-  fn: ({ amount, ovenAddress }) => ({
-    ovenAddress,
-    amount: xtzToMutez(amount).toString(),
-  }),
-  target: depositFx,
-});
-
-sample({
-  clock: depositSubmitted,
-  source: $depositAmount,
-  filter: (amount) => amount === "" || Number(amount) <= 0,
-  fn: () => "Amount must be greater than 0",
-  target: $depositError,
-});
-
-sample({ clock: depositFx.fail, fn: () => "Deposit failed", target: $depositError });
-
-// ─── Wiring: withdraw submit ─────────────────────────────────────────────────
-
-sample({
-  clock: withdrawSubmitted,
-  source: { amount: $withdrawAmount, ovenAddress: $activeOvenAddress },
-  filter: ({ amount }) => amount !== "" && Number(amount) > 0,
-  fn: ({ amount, ovenAddress }) => ({
-    ovenAddress,
-    amount: xtzToMutez(amount).toString(),
-  }),
-  target: withdrawFx,
-});
-
-sample({
-  clock: withdrawSubmitted,
-  source: $withdrawAmount,
-  filter: (amount) => amount === "" || Number(amount) <= 0,
-  fn: () => "Amount must be greater than 0",
-  target: $withdrawError,
-});
-
-sample({ clock: withdrawFx.fail, fn: () => "Withdrawal failed", target: $withdrawError });
-
-// ─── Wiring: borrow submit ───────────────────────────────────────────────────
-
-sample({
-  clock: borrowSubmitted,
-  source: { amount: $borrowAmount, ovenAddress: $activeOvenAddress },
-  filter: ({ amount }) => amount !== "" && Number(amount) > 0,
-  fn: ({ amount, ovenAddress }) => ({
-    ovenAddress,
-    amount: kusdToShard(amount).toString(),
-  }),
-  target: borrowFx,
-});
-
-sample({
-  clock: borrowSubmitted,
-  source: $borrowAmount,
-  filter: (amount) => amount === "" || Number(amount) <= 0,
-  fn: () => "Amount must be greater than 0",
-  target: $borrowError,
-});
-
-sample({ clock: borrowFx.fail, fn: () => "Borrow failed", target: $borrowError });
-
-// ─── Wiring: repay submit ────────────────────────────────────────────────────
-
-sample({
-  clock: repaySubmitted,
-  source: { amount: $repayAmount, ovenAddress: $activeOvenAddress },
-  filter: ({ amount }) => amount !== "" && Number(amount) > 0,
-  fn: ({ amount, ovenAddress }) => ({
-    ovenAddress,
-    amount: kusdToShard(amount).toString(),
-  }),
-  target: repayFx,
-});
-
-sample({
-  clock: repaySubmitted,
-  source: $repayAmount,
-  filter: (amount) => amount === "" || Number(amount) <= 0,
-  fn: () => "Amount must be greater than 0",
-  target: $repayError,
-});
-
-sample({ clock: repayFx.fail, fn: () => "Repay failed", target: $repayError });

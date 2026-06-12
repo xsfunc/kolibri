@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import { useUnit } from "effector-react";
 import {
   $ovenList,
@@ -16,7 +16,7 @@ import { css } from "styled-system/css";
 import { grid } from "../../../../styled-system/patterns";
 import { RefreshCw } from "lucide-react";
 import { dialogOpened, $dialogOpen, type Tab } from "@/features/manage-oven";
-import { bakerSetConfirmed } from "@/features/set-baker";
+import { $bakerDialogOpen, bakerDialogOpened } from "@/features/set-baker";
 
 const OvenManageDialog = lazy(() =>
   import("@/features/manage-oven").then((m) => ({
@@ -30,32 +30,37 @@ const SetBakerDialog = lazy(() =>
 );
 
 export const OvenList = () => {
-  const { ovenList, loading, pending, pkh, load, progress, pendingAddresses, dialogOpen } = useUnit(
-    {
-      ovenList: $ovenList,
-      loading: $ovensLoading,
-      pending: $ovensLoadPending,
-      pkh: $walletPKH,
-      load: loadOvensFx,
-      progress: $ovensLoadProgress,
-      pendingAddresses: $ovenAddressesPending,
-      dialogOpen: $dialogOpen,
-    },
-  );
+  const {
+    ovenList,
+    loading,
+    pending,
+    pkh,
+    load,
+    progress,
+    pendingAddresses,
+    dialogOpen,
+    bakerDialogOpen,
+    openDialog,
+    openBakerDialog,
+  } = useUnit({
+    ovenList: $ovenList,
+    loading: $ovensLoading,
+    pending: $ovensLoadPending,
+    pkh: $walletPKH,
+    load: loadOvensFx,
+    progress: $ovensLoadProgress,
+    pendingAddresses: $ovenAddressesPending,
+    dialogOpen: $dialogOpen,
+    bakerDialogOpen: $bakerDialogOpen,
+    openDialog: dialogOpened,
+    openBakerDialog: bakerDialogOpened,
+  });
 
-  const openDialog = useUnit(dialogOpened);
-  const [bakerOven, setBakerOven] = useState<string | null>(null);
-
-  useEffect(() => {
-    const unsub = bakerSetConfirmed.watch(() => setBakerOven(null));
-    return unsub;
-  }, []);
-
-  const handleAction = (ovenAddress: string, action: string) => {
+  const handleAction = (ovenAddress: string, action: Tab | "baker") => {
     if (action === "baker") {
-      setBakerOven(ovenAddress);
+      openBakerDialog(ovenAddress);
     } else {
-      openDialog({ ovenAddress, tab: action as Tab });
+      openDialog({ ovenAddress, tab: action });
     }
   };
 
@@ -152,9 +157,9 @@ export const OvenList = () => {
         </Suspense>
       )}
 
-      {bakerOven && (
+      {bakerDialogOpen && (
         <Suspense>
-          <SetBakerDialog ovenAddress={bakerOven} open={true} onClose={() => setBakerOven(null)} />
+          <SetBakerDialog />
         </Suspense>
       )}
     </div>
