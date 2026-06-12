@@ -7,6 +7,7 @@ import { card, skeleton } from "@/shared/ui/styles";
 import { css, cx } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
 import { Button } from "@/shared/ui/Button";
+import { CopyButton } from "@/shared/ui/CopyButton";
 import { truncateAddress, formatToken, formatUsd, formatPercent } from "@/shared/lib/format";
 import { BLOCK_EXPLORER_URL } from "@/shared/config/links";
 import {
@@ -67,6 +68,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
               >
                 {truncateAddress(ovenAddress)}
               </a>
+              <CopyButton value={ovenAddress} label="Copy oven address" />
             </h4>
             <p
               className={css({
@@ -330,6 +332,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
             >
               {truncateAddress(ovenAddress)}
             </a>
+            <CopyButton value={ovenAddress} label="Copy oven address" />
           </h4>
           <p
             className={css({
@@ -365,6 +368,7 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
           >
             {truncateAddress(oven.baker)}
           </a>
+          <CopyButton value={oven.baker} label="Copy baker address" />
         </p>
       )}
 

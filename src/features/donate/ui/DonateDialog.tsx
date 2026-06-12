@@ -16,7 +16,7 @@ import { $isConnected, $isInitializing } from "@/entities/wallet";
 import { connectWalletFx } from "@/features/connect-wallet";
 import { Dialog } from "@/shared/ui/Dialog";
 import { Button } from "@/shared/ui/Button";
-import { Copy } from "lucide-react";
+import { CopyButton } from "@/shared/ui/CopyButton";
 import { css } from "styled-system/css";
 
 export type { TxStatus } from "../model/model";
@@ -70,25 +70,8 @@ export const DonateDialog = () => {
             >
               {DONATE_ADDRESS}
             </code>
-            <button
-              onClick={() => {
-                void navigator.clipboard.writeText(DONATE_ADDRESS).catch(() => {});
-              }}
-              className={css({
-                bg: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: "2px",
-                marginLeft: "4px",
-                color: "token(colors.on-surface-variant)",
-                _hover: { color: "token(colors.primary-fixed-dim)" },
-                _active: { transform: "scale(0.9)" },
-                verticalAlign: "middle",
-              })}
-            >
-              <Copy size={12} />
-            </button>{" "}
-            Send any currency or NFT. Thank you!
+            <CopyButton value={DONATE_ADDRESS} label="Copy donation address" /> Send any currency or
+            NFT. Thank you!
           </p>
         </div>
 
