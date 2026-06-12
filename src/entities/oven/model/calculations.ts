@@ -1,6 +1,8 @@
-import { combine } from "effector";
 import type { BigNumber } from "@/shared/lib/bignumber";
+
+import { combine } from "effector";
 import { $ownedOvens, $priceData, $minterData, type OvenData } from "./model";
+import * as ovenMath from "../lib";
 
 export interface OvenCalculations {
   collateralXtz: BigNumber;
@@ -16,26 +18,12 @@ function computeOvenCalculations(
   price: BigNumber | null,
   collateralRate: BigNumber | null,
 ): OvenCalculations {
-  const collateralXtz = oven.balance.dividedBy(1e6);
-  const debtKusd = oven.outstandingTokens.dividedBy(1e18);
-
-  const collateralValueUsd = price ? collateralXtz.multipliedBy(price) : null;
-
-  const maxDebt =
-    collateralValueUsd && collateralRate
-      ? collateralValueUsd.multipliedBy(100).dividedBy(collateralRate)
-      : null;
-
-  const utilizationPct =
-    maxDebt && !debtKusd.isZero() && !maxDebt.isZero()
-      ? Math.min(100, debtKusd.dividedBy(maxDebt).multipliedBy(100).toNumber())
-      : 0;
-
-  const liquidationPrice =
-    !debtKusd.isZero() && !collateralXtz.isZero() && collateralRate
-      ? debtKusd.multipliedBy(collateralRate).dividedBy(collateralXtz.multipliedBy(100))
-      : null;
-
+  const collateralXtz = ovenMath.mutezToXtz(oven.balance);
+  const debtKusd = ovenMath.shardToKusd(oven.outstandingTokens);
+  const collateralValueUsd = ovenMath.collateralValueUsd(collateralXtz, price);
+  const maxDebt = ovenMath.maxDebt(collateralValueUsd, collateralRate);
+  const utilizationPct = ovenMath.utilizationPct(debtKusd, maxDebt);
+  const liquidationPrice = ovenMath.liquidationPrice(collateralXtz, debtKusd, collateralRate);
   return { collateralXtz, debtKusd, collateralValueUsd, maxDebt, utilizationPct, liquidationPrice };
 }
 

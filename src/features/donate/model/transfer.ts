@@ -10,6 +10,9 @@ export const DONATE_ADDRESS = "tz1UVGqvZd7LxLtA2ZDTMz74fXJWqxRjqJS4";
 const USDT_CONTRACT = "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o";
 const KUSD_CONTRACT = NETWORK_CONTRACTS.TOKEN!;
 
+// USDT (FA2) uses 6 decimals — same scale as mutez (10^6).
+const USDT_DECIMALS_FACTOR = MUTEZ;
+
 interface DonateParams {
   amount: string;
 }
@@ -34,7 +37,10 @@ const donateKusdRawFx = createEffect(async ({ amount, pkh }: DonateParams & { pk
 });
 
 const donateUsdtRawFx = createEffect(async ({ amount, pkh }: DonateParams & { pkh: string }) => {
-  const microAmount = new BigNumber(amount).multipliedBy(1e6).integerValue().toNumber();
+  const microAmount = new BigNumber(amount)
+    .multipliedBy(USDT_DECIMALS_FACTOR)
+    .integerValue()
+    .toNumber();
   const contract = await tezosToolkit.wallet.at(USDT_CONTRACT);
   const op = await contract.methodsObject
     .transfer([

@@ -1,7 +1,7 @@
 import type { BeaconWallet } from "@taquito/beacon-wallet";
 
 import { TezosToolkit } from "@taquito/taquito";
-import { DEFAULT_RPC } from "@/shared/config/links";
+import { DEFAULT_RPC, TZKT_API_URL } from "@/shared/config/links";
 import {
   CONTRACTS,
   HarbingerClient,
@@ -34,6 +34,8 @@ const stableCoinClient = new StableCoinClient(
   CONTRACTS_MAIN.OVEN_REGISTRY!,
   CONTRACTS_MAIN.MINTER!,
   CONTRACTS_MAIN.OVEN_FACTORY!,
+  undefined,
+  TZKT_API_URL,
 );
 
 export const setRpcNode = (url: string): void => {

@@ -1,6 +1,7 @@
 import { createStore, createEvent, combine } from "effector";
 import type { BigNumber } from "@/shared/lib/bignumber";
 import type { KusdPriceData } from "@/shared/api/tezos";
+import { mutezToXtz, shardToKusd, healthFactor } from "../lib";
 export type { KusdPriceData } from "@/shared/api/tezos";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -111,12 +112,12 @@ export interface OvenHealth {
 }
 
 function computeHealth(oven: OvenData, price: BigNumber | null): OvenHealth {
-  if (!price || oven.outstandingTokens.isZero()) {
+  const collateralXtz = mutezToXtz(oven.balance);
+  const debtKusd = shardToKusd(oven.outstandingTokens);
+  const factor = healthFactor(collateralXtz, debtKusd, price);
+  if (!factor) {
     return { factor: null, level: "safe" };
   }
-  const collateralValue = oven.balance.dividedBy(1e6).multipliedBy(price);
-  const debtValue = oven.outstandingTokens.dividedBy(1e18);
-  const factor = collateralValue.dividedBy(debtValue);
   const level: HealthLevel = factor.gt(1.8) ? "safe" : factor.gt(1.5) ? "warning" : "danger";
   return { factor, level };
 }

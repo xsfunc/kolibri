@@ -2,7 +2,15 @@ import { createEffect, createEvent, createStore, sample, attach, combine } from 
 import { getOvenClient, type KolibriOperation } from "@/shared/api/tezos";
 import { $wallet, $walletBalanceXTZ, $walletBalance } from "@/entities/wallet";
 import { refreshOvenFx, $ovenCalculations, $ovenHealthMap } from "@/entities/oven";
-import type { HealthLevel } from "@/entities/oven";
+import type { HealthLevel, OvenCalculations } from "@/entities/oven";
+import {
+  projectDepositUtil,
+  projectWithdrawUtil,
+  projectBorrowUtil,
+  projectRepayUtil,
+  xtzToMutez,
+  kusdToShard,
+} from "@/entities/oven";
 import { BigNumber } from "@/shared/lib/bignumber";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -213,52 +221,34 @@ export const $repayMax = combine($activeOvenCalc, $walletBalance, (calc, kusdBal
 
 export const $currentUtilization = $activeOvenCalc.map((calc) => calc?.utilizationPct ?? 0);
 
-export const $depositProjectedUtil = combine($depositAmount, $activeOvenCalc, (amount, calc) => {
-  const numAmount = Number(amount) || 0;
-  if (numAmount <= 0) return null;
+function projectionInput(amount: string, calc: OvenCalculations | null) {
   if (!calc) return null;
-  const coll = calc.collateralXtz.toNumber();
-  const max = calc.maxDebt?.toNumber() ?? 0;
-  const debt = calc.debtKusd.toNumber();
-  if (coll <= 0 || max <= 0) return debt > 0 ? null : 0;
-  const newMaxDebt = max * (1 + numAmount / coll);
-  if (debt <= 0 || newMaxDebt <= 0) return 0;
-  return Math.min(100, (debt / newMaxDebt) * 100);
+  return {
+    collateralXtz: calc.collateralXtz,
+    debtKusd: calc.debtKusd,
+    maxDebt: calc.maxDebt,
+    amount: new BigNumber(Number(amount) || 0),
+  };
+}
+
+export const $depositProjectedUtil = combine($depositAmount, $activeOvenCalc, (amount, calc) => {
+  const input = projectionInput(amount, calc);
+  return input ? projectDepositUtil(input) : null;
 });
 
 export const $withdrawProjectedUtil = combine($withdrawAmount, $activeOvenCalc, (amount, calc) => {
-  const numAmount = Number(amount) || 0;
-  if (numAmount <= 0) return null;
-  if (!calc) return null;
-  const coll = calc.collateralXtz.toNumber();
-  const max = calc.maxDebt?.toNumber() ?? 0;
-  const debt = calc.debtKusd.toNumber();
-  if (coll <= 0 || max <= 0) return null;
-  const newColl = coll - numAmount;
-  if (newColl <= 0) return debt > 0 ? 100 : 0;
-  const newMaxDebt = max * (newColl / coll);
-  if (debt <= 0 || newMaxDebt <= 0) return 0;
-  return Math.min(100, (debt / newMaxDebt) * 100);
+  const input = projectionInput(amount, calc);
+  return input ? projectWithdrawUtil(input) : null;
 });
 
 export const $borrowProjectedUtil = combine($borrowAmount, $activeOvenCalc, (amount, calc) => {
-  const numAmount = Number(amount) || 0;
-  if (numAmount <= 0) return null;
-  if (!calc) return null;
-  const max = calc.maxDebt?.toNumber() ?? 0;
-  const debt = calc.debtKusd.toNumber();
-  if (max <= 0) return null;
-  return Math.min(100, ((debt + numAmount) / max) * 100);
+  const input = projectionInput(amount, calc);
+  return input ? projectBorrowUtil(input) : null;
 });
 
 export const $repayProjectedUtil = combine($repayAmount, $activeOvenCalc, (amount, calc) => {
-  const numAmount = Number(amount) || 0;
-  if (numAmount <= 0) return null;
-  if (!calc) return null;
-  const max = calc.maxDebt?.toNumber() ?? 0;
-  const debt = calc.debtKusd.toNumber();
-  if (max <= 0) return null;
-  return Math.min(100, Math.max(0, ((debt - numAmount) / max) * 100));
+  const input = projectionInput(amount, calc);
+  return input ? projectRepayUtil(input) : null;
 });
 
 // ─── Derived: pending states ─────────────────────────────────────────────────
@@ -325,7 +315,7 @@ sample({
   filter: ({ amount }) => amount !== "" && Number(amount) > 0,
   fn: ({ amount, ovenAddress }) => ({
     ovenAddress,
-    amount: new BigNumber(amount).multipliedBy(1e6).integerValue().toString(),
+    amount: xtzToMutez(amount).toString(),
   }),
   target: depositFx,
 });
@@ -348,7 +338,7 @@ sample({
   filter: ({ amount }) => amount !== "" && Number(amount) > 0,
   fn: ({ amount, ovenAddress }) => ({
     ovenAddress,
-    amount: new BigNumber(amount).multipliedBy(1e6).integerValue().toString(),
+    amount: xtzToMutez(amount).toString(),
   }),
   target: withdrawFx,
 });
@@ -371,7 +361,7 @@ sample({
   filter: ({ amount }) => amount !== "" && Number(amount) > 0,
   fn: ({ amount, ovenAddress }) => ({
     ovenAddress,
-    amount: new BigNumber(amount).multipliedBy(1e18).integerValue().toString(),
+    amount: kusdToShard(amount).toString(),
   }),
   target: borrowFx,
 });
@@ -394,7 +384,7 @@ sample({
   filter: ({ amount }) => amount !== "" && Number(amount) > 0,
   fn: ({ amount, ovenAddress }) => ({
     ovenAddress,
-    amount: new BigNumber(amount).multipliedBy(1e18).integerValue().toString(),
+    amount: kusdToShard(amount).toString(),
   }),
   target: repayFx,
 });

@@ -34,3 +34,11 @@ export {
 } from "./model/loadOvens";
 export { $ovenCalculations } from "./model/calculations";
 export type { OvenCalculations } from "./model/calculations";
+export {
+  projectDepositUtil,
+  projectWithdrawUtil,
+  projectBorrowUtil,
+  projectRepayUtil,
+  xtzToMutez,
+  kusdToShard,
+} from "./lib";

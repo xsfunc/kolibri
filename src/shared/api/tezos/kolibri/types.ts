@@ -135,6 +135,17 @@ export type KusdPriceData = {
   timestamp: number;
 };
 
+export type MinterParams = {
+  stabilityFee: BigNumber;
+  collateralRate: BigNumber;
+};
+
+export type GlobalChainData = {
+  xtzUsdPrice: BigNumber;
+  timestamp: number;
+  minter: MinterParams;
+};
+
 export interface KolibriOperation {
   readonly opHash: string;
   confirmed(count?: number): Promise<void>;

@@ -2,6 +2,7 @@ import { useUnit } from "effector-react";
 import { $ownedOvens, $ovenHealthMap, type HealthLevel } from "../model/model";
 import { $refreshingOvenAddress } from "../model/loadOvens";
 import { $ovenCalculations } from "../model/calculations";
+import { mutezToXtz, shardToKusd } from "../lib";
 import { card, skeleton } from "@/shared/ui/styles";
 import { css, cx } from "styled-system/css";
 import { Progress } from "@/shared/ui/Progress";
@@ -285,8 +286,8 @@ export const OvenCard = ({ ovenAddress, onAction }: OvenCardProps) => {
 
   const healthLevel: HealthLevel = health?.level ?? "safe";
 
-  const collateralXtz = calc?.collateralXtz ?? oven.balance.dividedBy(1e6);
-  const debtKusd = calc?.debtKusd ?? oven.outstandingTokens.dividedBy(1e18);
+  const collateralXtz = calc?.collateralXtz ?? mutezToXtz(oven.balance);
+  const debtKusd = calc?.debtKusd ?? shardToKusd(oven.outstandingTokens);
   const collateralValueUsd = calc?.collateralValueUsd ?? null;
   const utilizationPct = calc?.utilizationPct;
   const liquidationPrice = calc?.liquidationPrice ?? null;

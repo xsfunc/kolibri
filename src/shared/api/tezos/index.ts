@@ -19,6 +19,8 @@ export type {
   KolibriOperation,
   InterestData,
   KusdPriceData,
+  GlobalChainData,
+  MinterParams,
 } from "./kolibri/types";
 
 export { KolibriContractError } from "./kolibri/errors";

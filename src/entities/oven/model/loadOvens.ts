@@ -1,7 +1,5 @@
 import { createEffect, createStore, sample, attach, combine } from "effector";
-import { BigNumber } from "@/shared/lib/bignumber";
-import { SHARD } from "@/shared/config/constants";
-import { TZKT_API_URL } from "@/shared/config/links";
+import type { BigNumber } from "@/shared/lib/bignumber";
 import type { InterestData, KusdPriceData } from "@/shared/api/tezos";
 import {
   ovensLoaded,
@@ -15,30 +13,24 @@ import {
   $priceData,
   type OvenData,
   type PriceData,
+  type MinterData,
 } from "./model";
-import {
-  stableCoinClient,
-  getOvenClient,
-  kusdPriceClient,
-  NETWORK_CONTRACTS,
-} from "@/shared/api/tezos";
+import { stableCoinClient, getOvenClient, kusdPriceClient } from "@/shared/api/tezos";
 import { $wallet } from "@/entities/wallet/@x/oven";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 async function fetchSingleOven(ovenAddress: string, interestData: InterestData): Promise<OvenData> {
   const client = getOvenClient(ovenAddress);
-
   const ovenStorage = await client.getOvenStorage();
-
-  const [baker, balance] = await Promise.all([client.getBaker(), client.getBalance()]);
-
-  const borrowedTokens = await client.getBorrowedTokens(ovenStorage);
-  const stabilityFee = await client.getStabilityFees(new Date(), ovenStorage, interestData);
-  const isLiquidated = await client.isLiquidated(ovenStorage);
-
+  const [baker, balance, borrowedTokens, stabilityFee, isLiquidated] = await Promise.all([
+    client.getBaker(),
+    client.getBalance(),
+    client.getBorrowedTokens(ovenStorage),
+    client.getStabilityFees(new Date(), ovenStorage, interestData),
+    client.isLiquidated(ovenStorage),
+  ]);
   const outstandingTokens = borrowedTokens.plus(stabilityFee);
-
   return {
     ovenAddress,
     ovenOwner: "",
@@ -61,7 +53,6 @@ const loadOvensRawFx = createEffect(async (pkh: string) => {
   ovenLoadProgress({ loaded: 0, total });
 
   const interestData = await stableCoinClient.getInterestData();
-
   const result: Record<string, OvenData> = {};
 
   for (let i = 0; i < addresses.length; i++) {
@@ -101,36 +92,18 @@ export const refreshOvenFx = attach({
   },
 });
 
-interface TzktHeadResponse {
-  quoteUsd: number;
-}
-
-interface MinterStorageResponse {
-  stabilityFee: string;
-  collateralizationPercentage: string;
-}
-
-/** Load global data (XTZ price, minter params) via TzKT API */
+/** Load global data (XTZ price, minter params) via the SDK (TzKT-backed). */
 export const loadGlobalDataFx = createEffect(async () => {
-  const [headRes, minterRes] = await Promise.all([
-    fetch(`${TZKT_API_URL}/head`),
-    fetch(`${TZKT_API_URL}/contracts/${NETWORK_CONTRACTS.MINTER!}/storage`),
-  ]);
-
-  const headData: TzktHeadResponse = await headRes.json();
-  const minterStorage: MinterStorageResponse = await minterRes.json();
+  const { xtzUsdPrice, timestamp, minter } = await stableCoinClient.getGlobalData();
 
   const priceData: PriceData = {
-    timestamp: Math.floor(Date.now() / 1000),
-    price: new BigNumber(headData.quoteUsd),
+    timestamp,
+    price: xtzUsdPrice,
   };
 
-  const rawStabilityFee = new BigNumber(minterStorage.stabilityFee);
-  const rawCollateralRate = new BigNumber(minterStorage.collateralizationPercentage);
-
-  const minterData = {
-    stabilityFee: rawStabilityFee.dividedBy(SHARD),
-    collateralRate: rawCollateralRate.dividedBy(SHARD),
+  const minterData: MinterData = {
+    stabilityFee: minter.stabilityFee,
+    collateralRate: minter.collateralRate,
     collateralOperand: null,
     privateLiquidationThreshold: null,
   };

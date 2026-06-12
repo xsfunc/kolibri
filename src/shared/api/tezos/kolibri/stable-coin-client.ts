@@ -1,8 +1,16 @@
 import { Network } from "./types";
-import type { Address, Shard, Oven, InterestData, KolibriOperation } from "./types";
+import type {
+  Address,
+  Shard,
+  Oven,
+  InterestData,
+  KolibriOperation,
+  GlobalChainData,
+} from "./types";
 import { UnitValue } from "@taquito/taquito";
 import type { TezosToolkit } from "@taquito/taquito";
 import { BigNumber } from "@/shared/lib/bignumber";
+import { SHARD } from "@/shared/config/constants";
 import {
   compoundingLinearApproximation,
   getCompoundingPeriods,
@@ -11,6 +19,15 @@ import {
 } from "./utils";
 import { handleContractError } from "./errors";
 import type Decimal from "decimal.js";
+
+interface TzktHeadResponse {
+  quoteUsd: number;
+}
+
+interface TzktMinterStorageResponse {
+  stabilityFee: string;
+  collateralizationPercentage: string;
+}
 
 export default class StableCoinClient {
   private minterStorageCache: Record<string, unknown> | null = null;
@@ -24,7 +41,46 @@ export default class StableCoinClient {
     private readonly minterAddress: Address,
     private readonly ovenFactoryAddress: Address,
     private readonly indexerURL?: string,
+    private readonly tzktApiUrl?: string,
   ) {}
+
+  /**
+   * Load global chain data via the TzKT API: current XTZ/USD quote and minter
+   * parameters (stability fee + required collateralization ratio).
+   *
+   * Network access and response parsing live here in the SDK layer; consumers
+   * receive ready-to-use BigNumber values (minter params are de-scaled by SHARD,
+   * so collateralRate is a percentage such as 155 = 155%).
+   */
+  public async getGlobalData(): Promise<GlobalChainData> {
+    if (!this.tzktApiUrl) {
+      throw new Error("StableCoinClient: tzktApiUrl is not configured");
+    }
+
+    const [headRes, minterRes] = await Promise.all([
+      fetch(`${this.tzktApiUrl}/head`),
+      fetch(`${this.tzktApiUrl}/contracts/${this.minterAddress}/storage`),
+    ]);
+
+    if (!headRes.ok) {
+      throw new Error(`Failed to fetch chain head from TzKT: ${headRes.status}`);
+    }
+    if (!minterRes.ok) {
+      throw new Error(`Failed to fetch minter storage from TzKT: ${minterRes.status}`);
+    }
+
+    const headData: TzktHeadResponse = await headRes.json();
+    const minterStorage: TzktMinterStorageResponse = await minterRes.json();
+
+    return {
+      xtzUsdPrice: new BigNumber(headData.quoteUsd),
+      timestamp: Math.floor(Date.now() / 1000),
+      minter: {
+        stabilityFee: new BigNumber(minterStorage.stabilityFee).dividedBy(SHARD),
+        collateralRate: new BigNumber(minterStorage.collateralizationPercentage).dividedBy(SHARD),
+      },
+    };
+  }
 
   public getNetwork(): string {
     const networkString = this.network.toString();
